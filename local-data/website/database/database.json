@@ -1,0 +1,10 @@
+{
+  "imageBase": "/database/photos/",
+  "home": "/database/home.json",
+  "myStory": "/database/my-story.json",
+  "educationExperience": "/database/education-experience.json",
+  "gisProjects": "/database/projects.json",
+  "researchPublications": "/database/publications.json",
+  "conferences": "/database/conferences.json",
+  "leadership": "/database/leadership.json"
+}

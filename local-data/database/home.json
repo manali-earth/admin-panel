@@ -1,0 +1,161 @@
+{
+  "page": "home",
+  "site": {
+    "title": "MAHARAJ KHAN MUNA",
+    "description": "Data Analyst & Researcher "
+  },
+  "person": {
+    "name": "MAHARAJ KHAN MUNA",
+    "intro": "A Geographer stands with the proud geographer icon 'Bijoypur white clay hill' of her place or origin, Netrokona, Bangladesh.",
+    "location": "Chittagong, Bangladesh",
+    "email": "munakhancu@gmail.com",
+    "phone": "+8801537415753",
+    "socials": [
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/muna-khan-103b802b5/",
+        "icon": "linkedin"
+      },
+      {
+        "label": "WhatsApp",
+        "url": "+8801537415753",
+        "icon": "whatsapp"
+      },
+      {
+        "label": "Facebook",
+        "url": "https://www.facebook.com/",
+        "icon": "facebook"
+      },
+      {
+        "label": "Instagram",
+        "url": "https://www.instagram.com/",
+        "icon": "instagram"
+      }
+    ]
+  },
+  "heroImage": "home/hero.jpg",
+  "news": [
+    {
+      "date": "April 2026",
+      "text": "Presented a poster at CSBS Research Day at the UofU on the use of machine learning and the NASA SWOT dataset to understand the water level in the Great Salt Lake Basin.",
+      "link": "/projects/?view=water-from-above",
+      "label": "Poster Link"
+    },
+    {
+      "date": "January 2026",
+      "text": "Started PhD in Geography at the University of Utah - School of Environment, Society and Sustainability. There, he will be working as a Graduate Research Assistant at the Earth and Water Observation and Sensing (EWOS) lab with Dr Sonam Sherpa."
+    },
+    {
+      "date": "September 2025",
+      "text": "Joined Auburn University as an Instructor to conduct science labs for undergraduates. Also, jointly appointed by the Citizen Science GIS lab at the Department of Geosciences as a GIS Technician to work on geospatial projects."
+    },
+    {
+      "date": "August 2025",
+      "text": "Graduated with an MS in Geography and Environmental Studies and a Graduate Certificate in GIS from Auburn University, Department of Geosciences."
+    },
+    {
+      "date": "July 2025",
+      "text": "Attended the Esri User Conference in San Diego, CA as a student assistant."
+    }
+  ],
+  "gallery": [
+    {
+      "image": "home/gallery-1.jpg",
+      "alt": "Field landscape"
+    },
+    {
+      "image": "home/gallery-2.jpg",
+      "alt": "Mountain field trip"
+    },
+    {
+      "image": "home/gallery-3.jpg",
+      "alt": "Urban geography"
+    },
+    {
+      "image": "home/gallery-4.jpg",
+      "alt": "Community fieldwork"
+    }
+  ],
+  "education": [
+    {
+      "period": "2023-2025",
+      "institution": "Auburn University, AL, USA",
+      "role": "MS in Geography and Environmental Studies",
+      "details": "Thesis: Urbanization and Heat Island Effect in South Asia. Certificate in Geographic Information Systems (GIS)."
+    },
+    {
+      "period": "2017-2021",
+      "institution": "Jahangirnagar University, Bangladesh",
+      "role": "BSc in Geography and Environment",
+      "details": "Volunteered at university clubs and initiated a project on campus sustainability."
+    }
+  ],
+  "experience": [
+    {
+      "period": "2023-2025",
+      "institution": "Auburn University, AL, USA",
+      "role": "Instructor · GIS Technician",
+      "details": "Conducted science labs and worked on geospatial projects."
+    },
+    {
+      "period": "2021-2023",
+      "institution": "Jahangirnagar University, Bangladesh",
+      "role": "Graduate Teaching and Research Assistant",
+      "details": "Delivered lectures, conducted labs, graded exams, mentored students, collected field data, and created maps."
+    }
+  ],
+  "projects": [
+    {
+      "id": "climate-regions",
+      "title": "Classify climate regions with Python - ESRI Tutorial",
+      "image": "home/project-1.jpg",
+      "description": "Climate zoning and multidimensional raster analysis using ArcGIS Pro Python Notebook.",
+      "meta": "ArcGIS Pro · Python Notebook"
+    },
+    {
+      "id": "urbanization-pattern",
+      "title": "Urbanization pattern using Machine Learning on Google Earth Engine",
+      "image": "home/project-2.jpg",
+      "description": "LULC change detection and land surface temperature analysis across nine South Asian cities.",
+      "meta": "Google Earth Engine · ArcGIS Pro"
+    },
+    {
+      "id": "water-from-above",
+      "title": "Water level from above",
+      "image": "home/project-3.jpg",
+      "description": "Exploring NASA SWOT data and machine learning to understand water-level dynamics in the Great Salt Lake Basin.",
+      "meta": "NASA SWOT · Machine Learning"
+    }
+  ],
+  "publications": [
+    {
+      "id": "heat-action-plans",
+      "year": "2025",
+      "title": "Evaluation of Heat Action Plans to Minimize Social Inequality of Heat Risk in South Asian Cities",
+      "authors": "Rishal F.H., Mitra C., Byahut S.",
+      "status": "In preparation",
+      "link": "/#contact"
+    },
+    {
+      "id": "urban-park-use",
+      "year": "2023",
+      "title": "Changing Perspectives in Urban Park Use and Management in Dhaka City, Bangladesh",
+      "authors": "Hoque S., Rishal F.H. and Saika U.",
+      "status": "The Jahangirnagar Review, Part II: Vol. 47",
+      "link": "https://www.researchgate.net/"
+    },
+    {
+      "id": "post-disaster-recovery",
+      "year": "2023",
+      "title": "Post-disaster Recovery for Building Resilience: Bangladesh Perspective",
+      "authors": "Rishal F.H., Huda K.M.S., Islam M.N., Islam and S.T.",
+      "status": "Lecture Notes in Civil Engineering, vol 283. Springer",
+      "link": "https://doi.org/10.1007/978-981-19-4715-5_11"
+    }
+  ],
+  "contact": {
+    "email": "fhr0002@auburn.edu",
+    "phone": "+1 334-895-0487",
+    "location": "Auburn, AL, USA"
+  }
+}

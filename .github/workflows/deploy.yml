@@ -1,0 +1,42 @@
+name: Deploy admin panel to Cloudflare
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: pnpm typecheck
+
+      - name: Build for Cloudflare
+        run: pnpm cf:build
+
+      # The Worker's own runtime secrets (GITHUB_TOKEN, WEBSITE_REPO,
+      # DATABASE_REPO) live in Cloudflare, set once via
+      # `wrangler secret put GITHUB_TOKEN` (or the dashboard) and
+      # wrangler.toml's [vars] — NOT here. This job only needs Cloudflare
+      # API credentials to push the build.
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy

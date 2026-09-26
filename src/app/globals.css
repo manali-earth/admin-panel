@@ -1,0 +1,777 @@
+/* ---------------------------------------------------------------------
+   Design tokens. The site's own content (headings, body copy, photos)
+   keeps its serif/sans styling from /site/styles.css exactly as the real
+   site loads it — untouched here. This file styles the ADMIN CHROME only:
+   topnav, sidebar, buttons, field editors, modals. Chrome uses a mono
+   type family deliberately, so a control never gets mistaken for content
+   you're editing — "IBM Plex Mono" where available, falling back to the
+   platform's own monospace stack everywhere else.
+   ------------------------------------------------------------------- */
+:root {
+  --paper: #faf9f4;
+  --ink: #2b2b24;
+  --ink-soft: #6b6b5e;
+  --moss: #4b6350;
+  --moss-dark: #384c3d;
+  --moss-soft: #e4e9de;
+  --clay: #a6462f;
+  --gold: #a3812f;
+  --line: #dcd8c8;
+  --line-soft: #ece9dd;
+  --font-body: "Open Sans", Arial, sans-serif;
+  --font-heading: "Cormorant Garamond", Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.app-loading {
+  padding: 80px 20px;
+  text-align: center;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+/* --- Top nav ----------------------------------------------------------- */
+
+.admin-topnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 4px;
+  align-items: center;
+  padding: 10px 24px;
+  background: var(--ink);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.admin-topnav a {
+  color: #cfd3c4;
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 7px 12px;
+  border-radius: 3px;
+  transition: background-color 0.12s, color 0.12s;
+}
+
+.admin-topnav a:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.admin-main {
+  min-height: calc(100vh - 46px);
+  background: var(--paper);
+}
+
+.page-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 0;
+  align-items: start;
+}
+
+.page-layout.page-layout-sidebar-collapsed {
+  grid-template-columns: 1fr 40px;
+}
+
+@media (max-width: 900px) {
+  .page-layout,
+  .page-layout.page-layout-sidebar-collapsed {
+    grid-template-columns: 1fr;
+  }
+}
+
+.site-page {
+  min-width: 0;
+  background: #fff;
+}
+
+/* Reuses the real site's .page-banner / h1 styling from styles.css */
+.page-heading.page-banner {
+  text-align: center;
+}
+
+.page-content {
+  width: min(1040px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 32px 0 60px;
+}
+
+/* --- Sidebar ------------------------------------------------------------ */
+
+.sidebar {
+  position: sticky;
+  top: 46px;
+  padding: 22px 20px;
+  background: var(--paper);
+  border-left: 1px solid var(--line);
+  min-height: calc(100vh - 46px);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.sidebar.sidebar-collapsed {
+  padding: 22px 6px;
+  align-items: center;
+}
+
+.sidebar-collapse-toggle {
+  align-self: flex-end;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink-soft);
+  border-radius: 3px;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.sidebar-collapse-toggle:hover {
+  border-color: var(--moss);
+  color: var(--moss);
+}
+
+.sidebar-collapsed .sidebar-collapse-toggle {
+  align-self: center;
+}
+
+.sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.sidebar-section-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.sidebar-hint {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.sidebar button {
+  font-family: var(--font-mono);
+}
+
+.preview-toggle-btn {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 9px 14px;
+  border-radius: 4px;
+  border: 1px solid var(--moss);
+  background: #fff;
+  color: var(--moss-dark);
+  cursor: pointer;
+  transition: background-color 0.12s, color 0.12s;
+}
+
+.preview-toggle-btn:hover {
+  background: var(--moss-soft);
+}
+
+.preview-toggle-btn-active {
+  background: var(--moss);
+  color: #fff;
+}
+
+.preview-toggle-btn-active:hover {
+  background: var(--moss-dark);
+}
+
+/* --- Simulated site (preview mode) --------------------------------------- */
+
+.simulated-site {
+  min-height: calc(100vh - 46px);
+  background: #fff;
+}
+
+.simulated-site-frame {
+  display: block;
+  width: 100%;
+  height: calc(100vh - 46px);
+  border: 0;
+}
+
+/* --- Save status / history ----------------------------------------------- */
+
+.save-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.save-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #b7bba9;
+  flex: none;
+}
+
+.save-status-saved .save-status-dot {
+  background: var(--moss);
+}
+
+.save-status-unsaved .save-status-dot {
+  background: var(--gold);
+}
+
+.save-status-saving .save-status-dot {
+  background: var(--moss);
+  animation: pulse 1s infinite ease-in-out;
+}
+
+.save-status-error .save-status-dot {
+  background: var(--clay);
+}
+
+.save-status-error-text {
+  color: var(--clay);
+  font-size: 11px;
+  width: 100%;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.save-btn {
+  font-family: var(--font-mono);
+  border: 1px solid var(--moss);
+  background: var(--moss);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.12s, border-color 0.12s;
+}
+
+.save-btn:hover:not(:disabled) {
+  background: var(--moss-dark);
+  border-color: var(--moss-dark);
+}
+
+.save-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.history-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.history-controls button,
+.add-item-btn,
+.list-item-actions button {
+  font-family: var(--font-mono);
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink-soft);
+  font-size: 11px;
+  padding: 6px 11px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s;
+}
+
+.history-controls button:disabled,
+.list-item-actions button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.history-controls button:not(:disabled):hover,
+.add-item-btn:hover {
+  border-color: var(--moss);
+  color: var(--moss-dark);
+}
+
+button.danger {
+  color: var(--clay);
+  border-color: var(--clay);
+}
+
+button.danger:hover {
+  background: var(--clay);
+  color: #fff;
+}
+
+/* --- Editable fields ------------------------------------------------------ */
+
+.field-shell {
+  margin-bottom: 16px;
+}
+
+.field-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  color: var(--ink-soft);
+  margin-bottom: 4px;
+}
+
+.block-list-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.block-item {
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line);
+  border-radius: 2px;
+  padding: 12px 14px;
+  background: #fff;
+  transition: border-left-color 0.12s;
+}
+
+.block-item:hover,
+.block-item:focus-within {
+  border-left-color: var(--moss);
+}
+
+.block-item-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.block-item-type {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+
+.block-image {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.block-image .editable-image {
+  flex: none;
+  width: 160px;
+}
+
+.block-image-alt {
+  flex: 1;
+  font-size: 12px;
+  color: var(--ink-soft);
+  align-self: center;
+}
+
+.block-add-row {
+  display: flex;
+  gap: 8px;
+}
+
+.field-group {
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--moss);
+  border-radius: 2px;
+  padding: 14px 16px 4px;
+  margin: 0 0 20px;
+  background: #fffefb;
+}
+
+.field-group legend {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--moss-dark);
+  font-weight: 600;
+  padding: 0 6px;
+}
+
+.editable-field,
+.editable-image {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  outline: 1px dashed transparent;
+  transition: outline-color 0.12s, background-color 0.12s;
+}
+
+.editable-multiline {
+  display: block;
+  white-space: pre-wrap;
+}
+
+.editable-field:hover,
+.editable-image:hover {
+  outline-color: var(--moss);
+  background: rgba(75, 99, 80, 0.06);
+}
+
+.editable-placeholder {
+  color: #a9ada2;
+  font-style: italic;
+}
+
+.edit-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--moss);
+  color: #fff;
+  font-size: 10px;
+  line-height: 18px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.12s;
+  pointer-events: none;
+}
+
+.editable-field:hover .edit-badge,
+.editable-image:hover .edit-badge {
+  opacity: 1;
+}
+
+.image-view-full-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(20, 26, 18, 0.55);
+  color: #fff;
+  font-size: 13px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s, background-color 0.12s;
+}
+
+.editable-image:hover .image-view-full-btn {
+  opacity: 1;
+}
+
+.image-view-full-btn:hover {
+  background: rgba(20, 26, 18, 0.85);
+}
+
+.image-lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 18, 13, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  padding: 40px;
+}
+
+.image-lightbox-viewport {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-lightbox-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  border-radius: 2px;
+}
+
+.image-lightbox-toolbar {
+  position: fixed;
+  top: 20px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(20, 26, 18, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  padding: 6px 8px;
+}
+
+.image-lightbox-toolbar button {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-lightbox-toolbar button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.image-lightbox-toolbar button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.image-lightbox-zoom-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #fff;
+  min-width: 38px;
+  text-align: center;
+}
+
+.image-lightbox-close {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(20, 26, 18, 0.6);
+  color: #fff;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-lightbox-close:hover {
+  background: rgba(20, 26, 18, 0.9);
+}
+
+.editable-input {
+  font: inherit;
+  color: inherit;
+  border: 1px solid var(--moss);
+  border-radius: 3px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  background: #fffef8;
+  width: 100%;
+  max-width: 100%;
+}
+
+.editable-textarea {
+  display: block;
+  resize: vertical;
+  min-height: 3em;
+  font-family: inherit;
+  line-height: inherit;
+}
+
+.editable-image {
+  display: block;
+}
+
+.editable-image img {
+  display: block;
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.editable-image-placeholder {
+  width: 100%;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--moss-soft);
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+}
+
+/* --- Lists ----------------------------------------------------------------- */
+
+.list-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.list-item-card {
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line);
+  border-radius: 2px;
+  padding: 14px 16px;
+  background: #fff;
+  transition: border-left-color 0.12s;
+}
+
+.list-item-card:hover,
+.list-item-card:focus-within {
+  border-left-color: var(--moss);
+}
+
+.list-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--moss-dark);
+  margin-bottom: 10px;
+}
+
+.list-item-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.string-list-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.string-list-item {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.string-list-item .editable-multiline {
+  flex: 1;
+}
+
+/* --- List picker modal (pick an existing item into a list) ----------------- */
+
+.list-picker-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 38, 27, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.list-picker {
+  background: #fff;
+  border-radius: 4px;
+  padding: 20px 24px;
+  width: min(480px, 90vw);
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 12px 32px rgba(20, 26, 18, 0.22);
+}
+
+.list-picker header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.list-picker h3 {
+  font-family: var(--font-heading);
+  color: var(--moss-dark);
+  margin: 0;
+}
+
+.list-picker header button {
+  font-family: var(--font-mono);
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink-soft);
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.list-picker-hint {
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin: 0 0 14px;
+}
+
+.list-picker-empty {
+  font-size: 12px;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.list-picker-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.list-picker-list label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.list-picker-id {
+  color: #999;
+  font-size: 11px;
+}

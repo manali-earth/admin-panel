@@ -139,6 +139,7 @@ export class GithubProvider implements DataProvider {
   private authHeaders(): HeadersInit {
     return {
       Accept: "application/vnd.github+json",
+      "User-Agent": "munakhan-admin-panel",
       "X-GitHub-Api-Version": "2022-11-28",
       ...(this.config.token ? { Authorization: `Bearer ${this.config.token}` } : {})
     };

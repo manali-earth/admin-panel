@@ -20,9 +20,8 @@ export interface CommitResult {
 }
 
 /**
- * Everything the admin panel needs from "the two repos" goes through this
- * interface. Swapping local-fs for real GitHub repos later is an env-var
- * change (DATA_PROVIDER=github + the repo/token settings below) — nothing
+ * Everything the admin panel needs from the local fixture or GitHub repo goes
+ * through this interface. Swapping providers is an env-var change — nothing
  * in app/, components/, or store/ needs to change.
  */
 export interface DataProvider {

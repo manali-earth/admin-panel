@@ -25,25 +25,31 @@ Every read/write goes through one interface, `DataProvider`
 | `DATA_PROVIDER` | Reads/writes | Needs |
 |---|---|---|
 | `local` (default) | `local-data/` in this repo | nothing |
-| `github` | The real website + database repos, via GitHub's GraphQL API | `GITHUB_TOKEN`, `WEBSITE_REPO`, `DATABASE_REPO` (see `.env.example`) |
+| `github` | The GitHub database repo via the Contents API; saves use the Git Database API | `DATABASE_REPO`; `GITHUB_TOKEN` is required for saves (see `.env.example`) |
 
 `local-data/website/database/database.json` and `local-data/database/*`
-mirror the exact split described for the real repos — `database.json`
-stays in the website repo; everything else under `database/` (the page
-JSON files + `photos/`) belongs in the database repo. When those two
-repos exist, set:
+mirror the local fixture layout. The real `manali-earth/database` repo
+contains `database.json`, all page JSON files, and `photos/` at its root.
+Set:
 
 ```
 DATA_PROVIDER=github
-GITHUB_TOKEN=...          # fine-grained PAT or GitHub App token
-WEBSITE_REPO=owner/name
-DATABASE_REPO=owner/name
+GITHUB_TOKEN=...          # fine-grained PAT or GitHub App token; needed to save
+DATABASE_REPO=owner/name  # contains database.json and the page JSON files
+DATABASE_BRANCH=main
+DATABASE_INDEX_PATH=database.json
+# Optional when database.json is in a separate private website repo:
+# WEBSITE_REPO=owner/private-website
+# WEBSITE_BRANCH=main
+# WEBSITE_INDEX_PATH=database/database.json
 ```
 
-and nothing else in the app changes — `src/lib/data-provider/github.ts`
-already implements real reads (Contents API) and a real atomic multi-file
-commit (`createCommitOnBranch` over the GraphQL API), matching the
-"one commit for JSON + images together" requirement.
+Public repositories can be loaded without `GITHUB_TOKEN`; the token is
+required for saving, or for loading an optional private website index.
+`src/lib/data-provider/github.ts` reads files
+through the Contents API and performs a real atomic multi-file commit using
+Git blobs, a tree, a commit, and a final fast-forward ref update. This keeps
+large gallery images out of GraphQL input variables.
 
 In production (Cloudflare Pages/Workers) these are set as Cloudflare
 secrets/vars, never committed — see `wrangler.toml` and the GitHub Actions

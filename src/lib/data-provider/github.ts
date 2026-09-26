@@ -2,32 +2,33 @@ import type { DatabaseIndex, PageDataMap, PageKey } from "@/lib/types";
 import { PAGE_FILENAMES } from "@/lib/page-filenames";
 import type { CommitRequest, CommitResult, DataProvider } from "./types";
 
-const GITHUB_GRAPHQL_URL = "https://api.github.com/graphql";
 const GITHUB_REST_URL = "https://api.github.com";
 
 interface GithubProviderConfig {
-  token: string;
-  websiteRepo: string; // "owner/name"
+  token?: string;
+  websiteRepo?: string;
   websiteBranch: string;
+  websiteIndexPath: string;
   databaseRepo: string; // "owner/name"
   databaseBranch: string;
+  databaseIndexPath: string;
 }
 
 function readConfig(): GithubProviderConfig {
-  const token = process.env.GITHUB_TOKEN;
-  const websiteRepo = process.env.WEBSITE_REPO;
-  const databaseRepo = process.env.DATABASE_REPO;
-  if (!token || !websiteRepo || !databaseRepo) {
-    throw new Error(
-      "GithubProvider requires GITHUB_TOKEN, WEBSITE_REPO and DATABASE_REPO to be set (see .env.example)."
-    );
+  const token = process.env.GITHUB_TOKEN?.trim() || undefined;
+  const websiteRepo = process.env.WEBSITE_REPO?.trim() || undefined;
+  const databaseRepo = process.env.DATABASE_REPO?.trim();
+  if (!databaseRepo) {
+    throw new Error("GithubProvider requires DATABASE_REPO to be set (see .env.example).");
   }
   return {
     token,
     websiteRepo,
     websiteBranch: process.env.WEBSITE_BRANCH || "main",
+    websiteIndexPath: process.env.WEBSITE_INDEX_PATH || "database/database.json",
     databaseRepo,
-    databaseBranch: process.env.DATABASE_BRANCH || "main"
+    databaseBranch: process.env.DATABASE_BRANCH || "main",
+    databaseIndexPath: process.env.DATABASE_INDEX_PATH || "database.json"
   };
 }
 
@@ -41,8 +42,11 @@ export class GithubProvider implements DataProvider {
   private config = readConfig();
 
   async getDatabaseIndex(): Promise<DatabaseIndex> {
-    const { owner, name } = splitRepo(this.config.websiteRepo);
-    const raw = await this.fetchFileContents(owner, name, this.config.websiteBranch, "database/database.json");
+    const indexRepo = this.config.websiteRepo || this.config.databaseRepo;
+    const indexBranch = this.config.websiteRepo ? this.config.websiteBranch : this.config.databaseBranch;
+    const indexPath = this.config.websiteRepo ? this.config.websiteIndexPath : this.config.databaseIndexPath;
+    const { owner, name } = splitRepo(indexRepo);
+    const raw = await this.fetchFileContents(owner, name, indexBranch, indexPath);
     return JSON.parse(raw) as DatabaseIndex;
   }
 
@@ -52,18 +56,15 @@ export class GithubProvider implements DataProvider {
     return JSON.parse(raw) as PageDataMap[K];
   }
 
-  /** Reads a single file via the REST Contents API (works for private repos too). */
+  /** Reads a single file via the REST Contents API (works for public and private repos). */
   private async fetchFileContents(owner: string, name: string, ref: string, filePath: string): Promise<string> {
     const url = `${GITHUB_REST_URL}/repos/${owner}/${name}/contents/${filePath}?ref=${encodeURIComponent(ref)}`;
-    const res = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${this.config.token}`,
-        Accept: "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28"
-      }
-    });
+    const res = await fetch(url, { headers: this.authHeaders() });
     if (!res.ok) {
-      throw new Error(`GitHub contents fetch failed for ${owner}/${name}/${filePath}: ${res.status} ${res.statusText}`);
+      const detail = await res.text();
+      throw new Error(
+        `GitHub contents fetch failed for ${owner}/${name}/${filePath}: ${res.status} ${res.statusText}${detail ? ` — ${detail.slice(0, 300)}` : ""}`
+      );
     }
     const json = (await res.json()) as { content: string; encoding: string };
     if (json.encoding !== "base64") throw new Error(`Unexpected encoding "${json.encoding}" for ${filePath}`);
@@ -71,90 +72,101 @@ export class GithubProvider implements DataProvider {
   }
 
   /**
-   * Commits every changed file to the database repo in a single commit via
-   * createCommitOnBranch, so a multi-file save (several JSON files plus new
-   * images) never lands as a half-applied series of separate commits.
+   * Creates one atomic commit containing all JSON and image changes.
+   *
+   * The Git Database API is used instead of createCommitOnBranch because the
+   * latter sends large binary images as GraphQL input variables. Here each
+   * image is uploaded as a blob, then one tree, one commit, and one fast-forward
+   * ref update are created. Readers see the new files only after the final ref
+   * update, and empty/non-JSON GitHub responses are reported clearly.
    */
   async commit(request: CommitRequest): Promise<CommitResult> {
+    if (!this.config.token) {
+      throw new Error("GITHUB_TOKEN is required to save changes when DATA_PROVIDER=github.");
+    }
     const { owner, name } = splitRepo(this.config.databaseRepo);
     const branch = this.config.databaseBranch;
-    const expectedHeadOid = await this.getBranchHeadOid(owner, name, branch);
+    const head = await this.githubJson<{ object: { sha: string } }>(
+      `/repos/${owner}/${name}/git/ref/heads/${encodeURIComponent(branch)}`
+    );
+    const headSha = head.object.sha;
+    const headCommit = await this.githubJson<{ tree: { sha: string } }>(
+      `/repos/${owner}/${name}/git/commits/${headSha}`
+    );
 
-    const query = /* GraphQL */ `
-      mutation ($input: CreateCommitOnBranchInput!) {
-        createCommitOnBranch(input: $input) {
-          commit {
-            oid
-            url
-          }
-        }
-      }
-    `;
-
-    const variables = {
-      input: {
-        branch: {
-          repositoryNameWithOwner: `${owner}/${name}`,
-          branchName: branch
-        },
-        message: { headline: request.message },
-        expectedHeadOid,
-        fileChanges: {
-          additions: request.databaseFiles.map((f) => ({
-            path: f.path,
-            contents: f.contentsBase64
-          })),
-          deletions: (request.databaseFileDeletions ?? []).map((path) => ({ path }))
-        }
-      }
-    };
-
-    const result = await this.graphql<{
-      createCommitOnBranch: { commit: { oid: string; url: string } };
-    }>(query, variables);
-
-    return {
-      provider: "github",
-      commitSha: result.createCommitOnBranch.commit.oid,
-      commitUrl: result.createCommitOnBranch.commit.url
-    };
-  }
-
-  private async getBranchHeadOid(owner: string, name: string, branch: string): Promise<string> {
-    const query = /* GraphQL */ `
-      query ($owner: String!, $name: String!, $qualifiedName: String!) {
-        repository(owner: $owner, name: $name) {
-          ref(qualifiedName: $qualifiedName) {
-            target {
-              oid
-            }
-          }
-        }
-      }
-    `;
-    const result = await this.graphql<{
-      repository: { ref: { target: { oid: string } } | null } | null;
-    }>(query, { owner, name, qualifiedName: `refs/heads/${branch}` });
-
-    const oid = result.repository?.ref?.target?.oid;
-    if (!oid) throw new Error(`Could not resolve HEAD for ${owner}/${name}@${branch}`);
-    return oid;
-  }
-
-  private async graphql<T>(query: string, variables: Record<string, unknown>): Promise<T> {
-    const res = await fetch(GITHUB_GRAPHQL_URL, {
+    const blobs = await Promise.all(
+      request.databaseFiles.map(async (file) => ({
+        path: file.path,
+        mode: "100644",
+        type: "blob",
+        sha: await this.createBlob(owner, name, file.contentsBase64)
+      }))
+    );
+    const tree = await this.githubJson<{ sha: string }>(`/repos/${owner}/${name}/git/trees`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${this.config.token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ query, variables })
+      body: JSON.stringify({
+        base_tree: headCommit.tree.sha,
+        tree: [
+          ...blobs,
+          ...(request.databaseFileDeletions ?? []).map((path) => ({
+            path,
+            mode: "100644",
+            type: "blob",
+            sha: null
+          }))
+        ]
+      })
     });
-    const json = (await res.json()) as { data?: T; errors?: Array<{ message: string }> };
-    if (!res.ok || json.errors) {
-      const message = json.errors?.map((e) => e.message).join("; ") || res.statusText;
-      throw new Error(`GitHub GraphQL error: ${message}`);
+    const commit = await this.githubJson<{ sha: string; html_url: string }>(`/repos/${owner}/${name}/git/commits`, {
+      method: "POST",
+      body: JSON.stringify({ message: request.message, tree: tree.sha, parents: [headSha] })
+    });
+    await this.githubJson(`/repos/${owner}/${name}/git/refs/heads/${encodeURIComponent(branch)}`, {
+      method: "PATCH",
+      body: JSON.stringify({ sha: commit.sha, force: false })
+    });
+    return { provider: "github", commitSha: commit.sha, commitUrl: commit.html_url };
+  }
+
+  private async createBlob(owner: string, name: string, contentsBase64: string): Promise<string> {
+    const blob = await this.githubJson<{ sha: string }>(`/repos/${owner}/${name}/git/blobs`, {
+      method: "POST",
+      body: JSON.stringify({ content: contentsBase64, encoding: "base64" })
+    });
+    return blob.sha;
+  }
+
+  private authHeaders(): HeadersInit {
+    return {
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+      ...(this.config.token ? { Authorization: `Bearer ${this.config.token}` } : {})
+    };
+  }
+
+  private async githubJson<T = unknown>(path: string, init: RequestInit = {}): Promise<T> {
+    const res = await fetch(`${GITHUB_REST_URL}${path}`, {
+      ...init,
+      headers: {
+        ...this.authHeaders(),
+        ...(init.body ? { "Content-Type": "application/json" } : {}),
+        ...init.headers
+      }
+    });
+    const text = await res.text();
+    let json: T | { message?: string } | undefined;
+    try {
+      json = text ? (JSON.parse(text) as T | { message?: string }) : undefined;
+    } catch {
+      throw new Error(`GitHub API returned invalid JSON (${res.status} ${res.statusText}): ${text.slice(0, 300)}`);
     }
-    return json.data as T;
+    if (!res.ok) {
+      const message = json && typeof json === "object" && "message" in json ? json.message : undefined;
+      throw new Error(
+        `GitHub API error ${res.status} ${res.statusText}: ${message || text.slice(0, 300) || "empty response"}`
+      );
+    }
+    if (!json) throw new Error(`GitHub API returned an empty response for ${path}.`);
+    return json as T;
   }
 }

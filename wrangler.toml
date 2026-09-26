@@ -12,10 +12,13 @@ binding = "ASSETS"
 # Pages/Workers dashboard) so it never sits in a committed file.
 [vars]
 DATA_PROVIDER = "github"
-WEBSITE_REPO = "manali-earth/portfolio"    # "owner/website-repo-name"
+# The private website repo owns the database index in this deployment.
+WEBSITE_REPO = "manali-earth/portfolio"  # "owner/private-website-repo"
 WEBSITE_BRANCH = "main"
+WEBSITE_INDEX_PATH = "database/database.json"
 DATABASE_REPO = "manali-earth/database"   # "owner/database-repo-name"
 DATABASE_BRANCH = "main"
+DATABASE_INDEX_PATH = "database.json"
 
 # NOTE: @opennextjs/cloudflare's exact build/CLI commands move fast enough
 # that this file's `main` path and the [assets] shape are worth checking

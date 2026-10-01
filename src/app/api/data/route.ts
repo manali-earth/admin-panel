@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDataProvider } from "@/lib/data-provider";
 import type { PageKey } from "@/lib/types";
+import { requestHasValidSession } from "@/lib/auth";
 
 const PAGE_KEYS: PageKey[] = [
   "home",
@@ -12,7 +13,10 @@ const PAGE_KEYS: PageKey[] = [
   "leadership"
 ];
 
-export async function GET() {
+export async function GET(request: Request) {
+  if (!(await requestHasValidSession(request))) {
+    return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  }
   try {
     const provider = getDataProvider();
     const index = await provider.getDatabaseIndex();

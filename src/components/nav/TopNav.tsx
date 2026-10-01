@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useContentStore } from "@/store/content-store";
 import { GuardedLink } from "./GuardedLink";
 
@@ -14,8 +15,14 @@ const NAV_ITEMS = [
 ];
 
 export function TopNav() {
+  const pathname = usePathname();
   const previewMode = useContentStore((s) => s.previewMode);
-  if (previewMode) return null;
+  if (previewMode || pathname === "/login") return null;
+
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    window.location.assign("/login");
+  }
 
   return (
     <nav className="admin-topnav">
@@ -24,6 +31,9 @@ export function TopNav() {
           {item.label}
         </GuardedLink>
       ))}
+      <button type="button" className="admin-logout-btn" onClick={logout}>
+        Log out
+      </button>
     </nav>
   );
 }

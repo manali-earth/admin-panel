@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import { getDataProvider } from "@/lib/data-provider";
 import type { CommitRequest } from "@/lib/data-provider/types";
+import { requestHasValidSession } from "@/lib/auth";
 
 export async function POST(request: Request) {
+  if (!(await requestHasValidSession(request))) {
+    return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  }
   let body: CommitRequest;
   try {
     body = (await request.json()) as CommitRequest;

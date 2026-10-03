@@ -1,15 +1,17 @@
 :root {
-    /* Palette taken from the photograph: lake water, cliff clay, dupatta crimson, hazy sky */
-    --site-ink: #1a2b2c;
-    --lake: #173a3c;
-    --site-paper: #fbfcfc;
-    --blush: #f3e7e6;
-    --rule: #dcc7c6;
-    --rule-on-dark: rgba(255, 255, 255, .18);
-    --crimson: #8a2438;
-    --rose: #e3b1b6;
-    --text-soft: #526063;
-    --text-on-dark: rgba(251, 252, 252, .8);
+    /* Light red / crimson / orange palette. Text stays a warm dark brown so it remains readable on the light tints. */
+    --site-ink: #5a2f2c;
+    --site-paper: #fffaf7;
+    --blush: #fdeceb;
+    --rule: #f3cfc9;
+    --crimson: #c63a53;
+    --crimson-soft: #f08fa0;
+    --crimson-hover: #a82c44;
+    --orange: #e98a4b;
+    --orange-soft: #ffd3b0;
+    --band-red: #fbd5d0;
+    --band-orange: #ffe2cb;
+    --text-soft: #8c5e59;
     --white: #fff;
     --font-display: 'Newsreader', Georgia, serif;
     --site-font-body: 'Public Sans', Arial, sans-serif
@@ -60,11 +62,11 @@ body {
 }
 
 .site-header {
-    background: var(--lake);
+    background: var(--band-red);
     position: sticky;
     top: 0;
     z-index: 10;
-    border-bottom: 1px solid var(--crimson)
+    border-bottom: 2px solid var(--orange)
 }
 
 .header-inner {
@@ -82,7 +84,7 @@ body {
     font-family: var(--font-display);
     font-size: 26px;
     font-weight: 500;
-    color: var(--site-paper);
+    color: var(--site-ink);
     text-decoration: none;
     white-space: nowrap
 }
@@ -94,7 +96,7 @@ body {
 }
 
 .site-header nav a {
-    color: var(--text-on-dark);
+    color: var(--site-ink);
     text-decoration: none;
     font-size: 11px;
     line-height: 1.2;
@@ -103,7 +105,7 @@ body {
 
 .site-header nav a:hover,
 .site-title:hover {
-    color: var(--rose);
+    color: var(--crimson-hover);
     text-decoration: underline
 }
 
@@ -111,7 +113,7 @@ body {
     display: none;
     background: none;
     border: 0;
-    color: var(--site-paper);
+    color: var(--site-ink);
     font: 600 12px 'Public Sans'
 }
 
@@ -139,8 +141,7 @@ body {
     align-items: flex-end;
     justify-content: flex-end;
     color: #fff;
-    /* only the lower part is shaded, so the photo keeps its full colour above the caption */
-    background: linear-gradient(to top, rgba(10, 30, 32, .6) 0%, rgba(10, 30, 32, .34) 26%, rgba(10, 30, 32, 0) 55%)
+    /* no tint or shading on the photo; the caption stays readable through its text-shadow */
 }
 
 .hero-copy {
@@ -153,7 +154,7 @@ body {
     letter-spacing: .005em;
     margin: 0 0 10px;
     white-space: nowrap;
-    text-shadow: 0 1px 14px rgba(0, 0, 0, .35)
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .45), 0 2px 18px rgba(0, 0, 0, .55)
 }
 
 .hero-role {
@@ -165,7 +166,7 @@ body {
     max-width: 340px;
     text-wrap: balance;
     color: rgba(255, 255, 255, .92);
-    text-shadow: 0 1px 8px rgba(0, 0, 0, .45)
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .5), 0 1px 12px rgba(0, 0, 0, .6)
 }
 
 .page-banner h1 {
@@ -325,14 +326,14 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
-    opacity: .7;
-    transition: opacity .2s
+    display: block
 }
 
-.gallery-thumb.active img,
-.gallery-thumb:hover img {
-    opacity: 1
+/* thumbnails show at full colour; the selected one is marked with an outline instead of fading the others */
+.gallery-thumb.active,
+.gallery-thumb:hover {
+    outline: 2px solid var(--orange);
+    outline-offset: 1px
 }
 
 .gallery-caption {
@@ -364,13 +365,13 @@ body {
 .project-card {
     border: 1px solid var(--rule);
     background: var(--white);
-    box-shadow: 0 2px 8px rgba(23, 58, 60, .08);
+    box-shadow: 0 2px 8px rgba(198, 58, 83, .10);
     transition: transform .2s, box-shadow .2s
 }
 
 .project-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(23, 58, 60, .14)
+    box-shadow: 0 6px 16px rgba(198, 58, 83, .18)
 }
 
 .project-card img {
@@ -524,15 +525,15 @@ body {
 }
 
 .contact-section {
-    background: var(--lake);
-    color: var(--text-on-dark);
+    background: var(--band-orange);
+    color: var(--site-ink);
     text-align: center;
     padding: 42px 22px 34px;
     margin-top: 20px
 }
 
 .contact-section h2 {
-    color: var(--site-paper);
+    color: var(--site-ink);
     margin-bottom: 12px
 }
 
@@ -542,7 +543,7 @@ body {
 }
 
 .contact-section a {
-    color: var(--rose)
+    color: var(--crimson-hover)
 }
 
 .footer-socials {
@@ -551,8 +552,8 @@ body {
 }
 
 .footer-socials a {
-    color: var(--lake);
-    border-color: var(--lake)
+    color: var(--crimson);
+    border-color: var(--crimson-soft)
 }
 
 .back-top {
@@ -562,7 +563,7 @@ body {
 .back-top a {
     text-decoration: none;
     font-size: 11px;
-    color: var(--rose)
+    color: var(--crimson-hover)
 }
 
 footer {
@@ -609,12 +610,12 @@ footer a {
         top: 65px;
         left: 0;
         right: 0;
-        background: var(--lake);
+        background: var(--band-red);
         padding: 17px 22px;
         flex-direction: column;
         align-items: flex-start;
         gap: 13px;
-        border-top: 1px solid var(--rule-on-dark)
+        border-top: 1px solid var(--rule)
     }
 
     .site-header nav.open {
@@ -721,7 +722,7 @@ footer a {
 
 /* Homepage sections, branded social icons, and query-detail cards */
 .footer-socials a {
-    background: rgba(23, 58, 60, .05)
+    background: rgba(198, 58, 83, .08)
 }
 
 .footer-socials svg {
@@ -766,7 +767,7 @@ footer a {
     border: 1px solid var(--rule);
     background: var(--white);
     padding: 20px;
-    box-shadow: 0 2px 8px rgba(23, 58, 60, .08)
+    box-shadow: 0 2px 8px rgba(198, 58, 83, .10)
 }
 
 .conference-card h3,
@@ -872,7 +873,7 @@ button:focus-visible {
 .site-header button:focus-visible,
 .contact-section a:focus-visible,
 .hero a:focus-visible {
-    outline-color: var(--rose)
+    outline-color: var(--crimson)
 }
 
 
@@ -895,8 +896,13 @@ button:focus-visible {
     color: var(--site-ink)
 }
 
+.segment-nav a {
+    background: var(--blush)
+}
+
 .segment-nav a:hover {
-    border-color: var(--site-ink)
+    background: var(--orange-soft);
+    border-color: var(--orange)
 }
 
 .segment-nav a span {
@@ -912,7 +918,7 @@ button:focus-visible {
 .project-segment>h2 {
     margin: 0 0 20px;
     padding-bottom: 10px;
-    border-bottom: 1px solid var(--rule)
+    border-bottom: 2px solid var(--orange-soft)
 }
 
 .segment-empty {

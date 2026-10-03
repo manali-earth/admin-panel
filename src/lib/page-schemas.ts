@@ -20,7 +20,7 @@ export type FieldDef =
   | { kind: "select"; key: string; label: string; options: { value: string; label: string }[] }
   | { kind: "stringList"; key: string; label: string; itemLabel: string }
   | { kind: "group"; key: string; label: string; fields: FieldDef[] }
-  | { kind: "list"; key: string; label: string; itemLabel: string; itemFields: FieldDef[]; addFrom?: PickSource }
+  | { kind: "list"; key: string; label: string; itemLabel: string; itemFields: FieldDef[]; addFrom?: PickSource; autoId?: boolean }
   /** An ordered, article-style mix of paragraph and image blocks — see BlockListEditor. */
   | { kind: "blockList"; key: string; label: string };
 
@@ -70,7 +70,6 @@ const contentSectionItemFields: FieldDef[] = [
 ];
 
 const publicationItemFields: FieldDef[] = [
-  { kind: "text", key: "id", label: "ID (used by ?view= links — keep unique)" },
   { kind: "text", key: "year", label: "Year" },
   { kind: "text", key: "title", label: "Title" },
   { kind: "text", key: "authors", label: "Authors" },
@@ -146,7 +145,6 @@ export const homeSchema: PageSchema = {
       label: "Pinned projects (independent copies, picked from Projects)",
       itemLabel: "Pinned project",
       itemFields: [
-        { kind: "text", key: "id", label: "ID (matches a projects.json id)" },
         { kind: "text", key: "title", label: "Title" },
         { kind: "image", key: "image", label: "Image" },
         { kind: "textarea", key: "description", label: "Short description" },
@@ -246,8 +244,8 @@ export const gisProjectsSchema: PageSchema = {
       key: "projects",
       label: "Projects",
       itemLabel: "Project",
+      autoId: true,
       itemFields: [
-        { kind: "text", key: "id", label: "ID (used by ?view= links — keep unique)" },
         { kind: "select", key: "category", label: "Project page section", options: PROJECT_CATEGORIES },
         { kind: "text", key: "title", label: "Title" },
         { kind: "image", key: "image", label: "Image (optional)" },
@@ -272,7 +270,7 @@ export const researchPublicationsSchema: PageSchema = {
   fields: [
     { kind: "text", key: "title", label: "Page title" },
     { kind: "text", key: "heading", label: "Heading", as: "h1" },
-    { kind: "list", key: "publications", label: "Publications", itemLabel: "Publication", itemFields: publicationItemFields }
+    { kind: "list", key: "publications", label: "Publications", itemLabel: "Publication", itemFields: publicationItemFields, autoId: true }
   ]
 };
 
@@ -288,8 +286,8 @@ export const conferencesSchema: PageSchema = {
       key: "items",
       label: "Conferences",
       itemLabel: "Conference",
+      autoId: true,
       itemFields: [
-        { kind: "text", key: "id", label: "ID (used by ?view= links — keep unique)" },
         { kind: "text", key: "title", label: "Title" },
         { kind: "text", key: "date", label: "Date / place" },
         { kind: "textarea", key: "details", label: "Details" }
@@ -311,8 +309,8 @@ export const leadershipSchema: PageSchema = {
       key: "items",
       label: "Leadership & volunteer items",
       itemLabel: "Item",
+      autoId: true,
       itemFields: [
-        { kind: "text", key: "id", label: "ID (used by ?view= links — keep unique)" },
         { kind: "text", key: "title", label: "Title" },
         { kind: "text", key: "date", label: "Date" },
         { kind: "textarea", key: "details", label: "Details" }

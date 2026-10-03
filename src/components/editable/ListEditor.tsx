@@ -6,6 +6,7 @@ import { fieldReactKey } from "@/lib/page-schemas";
 import type { PageKey } from "@/lib/types";
 import type { FieldPath } from "@/store/content-store";
 import { useContentStore } from "@/store/content-store";
+import { generateId } from "@/lib/auto-id";
 import { FieldRenderer } from "./FieldRenderer";
 import { ListPicker } from "./ListPicker";
 
@@ -16,13 +17,16 @@ interface ListEditorProps {
   itemFields: FieldDef[];
   itemLabel: string;
   addFrom?: PickSource;
+  /** Items get an automatically generated unique id (used by ?view= detail links). */
+  autoId?: boolean;
 }
 
-export function ListEditor({ pageKey, path, items, itemFields, itemLabel, addFrom }: ListEditorProps) {
+export function ListEditor({ pageKey, path, items, itemFields, itemLabel, addFrom, autoId }: ListEditorProps) {
   const addListItem = useContentStore((s) => s.addListItem);
   const removeListItemAt = useContentStore((s) => s.removeListItemAt);
   const moveListItem = useContentStore((s) => s.moveListItem);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const newItem = () => (autoId ? { id: generateId(itemLabel, items.map((x) => (x as { id?: string })?.id ?? "")) } : {});
 
   return (
     <div className="list-editor">
@@ -62,7 +66,7 @@ export function ListEditor({ pageKey, path, items, itemFields, itemLabel, addFro
           + Add {itemLabel.toLowerCase()} from existing
         </button>
       ) : (
-        <button type="button" className="add-item-btn" onClick={() => addListItem(pageKey, path, {})}>
+        <button type="button" className="add-item-btn" onClick={() => addListItem(pageKey, path, newItem())}>
           + Add {itemLabel.toLowerCase()}
         </button>
       )}

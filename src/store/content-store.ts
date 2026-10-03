@@ -6,6 +6,7 @@ import { appendAtPath, getAtPath, moveAtPath, removeAtPath, setAtPath, type Path
 import { fileToBase64, generateImageFilename, utf8ToBase64 } from "@/lib/base64";
 import { collectImagePaths } from "@/lib/collect-image-paths";
 import { schemaForKey } from "@/lib/page-schemas";
+import { withAutoIds } from "@/lib/auto-id";
 import type { CommitRequest } from "@/lib/data-provider/types";
 
 export type FieldPath = PathSegment[];
@@ -115,8 +116,9 @@ export const useContentStore = create<ContentStore>((set, get) => ({
   loadPage: (key, data) => {
     const state = get();
     if (state.draft[key]) return; // already loaded — don't clobber in-progress edits
-    const nextOriginal = { ...state.original, [key]: data };
-    const nextDraft = { ...state.draft, [key]: structuredClone(data) };
+    const withIds = withAutoIds(key, data); // items without an id get one automatically
+    const nextOriginal = { ...state.original, [key]: withIds };
+    const nextDraft = { ...state.draft, [key]: structuredClone(withIds) };
     set({
       original: nextOriginal,
       draft: nextDraft,

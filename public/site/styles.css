@@ -812,10 +812,14 @@ footer a {
     line-height: 1.8
 }
 
+/* On-demand (detail) pages: every image fills the same column width and keeps its own aspect ratio,
+   so nothing is cropped; only the height varies from image to image. */
 .detail-image {
+    display: block;
     width: 100%;
-    max-height: 360px;
-    object-fit: cover
+    height: auto;
+    max-height: none;
+    object-fit: contain
 }
 
 .section-image {
@@ -828,8 +832,9 @@ footer a {
 .section-image img {
     display: block;
     width: 100%;
-    max-height: 420px;
-    object-fit: cover
+    height: auto;
+    max-height: none;
+    object-fit: contain
 }
 
 .section-image figcaption {
@@ -837,12 +842,6 @@ footer a {
     color: var(--text-soft);
     padding: 8px 10px;
     text-align: center
-}
-
-@media(max-width:520px) {
-    .section-image img {
-        max-height: 280px
-    }
 }
 
 .back-link {

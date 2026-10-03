@@ -119,6 +119,7 @@ export function FieldRenderer({ pageKey, field, basePath }: FieldRendererProps) 
             itemFields={field.itemFields}
             itemLabel={field.itemLabel}
             addFrom={field.addFrom}
+            autoId={field.autoId}
           />
         </FieldShell>
       );

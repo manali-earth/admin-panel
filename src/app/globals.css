@@ -824,3 +824,14 @@ button.danger:hover {
 .html-hint code {
   font-size: 12px;
 }
+
+/* Edit boxes keep the height of the text they replace and never scroll internally. */
+.editable-autosize,
+.editable-textarea {
+  display: block;
+  box-sizing: border-box;
+  resize: none;
+  overflow: hidden;
+  min-height: 0;
+  line-height: inherit;
+}

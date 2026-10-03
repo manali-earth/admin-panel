@@ -25,6 +25,10 @@ export function PageEditor({ schema }: { schema: PageSchema }) {
           <FieldRenderer key={fieldReactKey(f)} pageKey={schema.key} field={f} basePath={[]} />
         ))}
       </header>
+      <p className="html-hint">
+        Text fields accept HTML tags such as <code>&lt;br&gt;</code>, <code>&lt;b&gt;</code>, <code>&lt;i&gt;</code> and{" "}
+        <code>&lt;a href=&quot;…&quot;&gt;</code>. They are shown as typed here and rendered on the website and in Preview.
+      </p>
       <div className="page-content">
         {rest.map((f) => (
           <FieldRenderer key={fieldReactKey(f)} pageKey={schema.key} field={f} basePath={[]} />

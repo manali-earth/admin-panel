@@ -8,7 +8,7 @@ const NAV_ITEMS = [
   { href: "/", label: "Home" },
   { href: "/my-story", label: "My Story" },
   { href: "/education-experience", label: "Education & Experience" },
-  { href: "/gis-projects", label: "GIS Projects" },
+  { href: "/gis-projects", label: "Projects" },
   { href: "/research-publications", label: "Publications" },
   { href: "/conferences", label: "Conferences" },
   { href: "/leadership", label: "Leadership" }

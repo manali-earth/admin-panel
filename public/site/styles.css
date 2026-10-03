@@ -151,18 +151,9 @@ body {
 #hero-name {
     font: 400 clamp(24px, 3.2vw, 40px)/1.12 'Newsreader', Georgia, serif;
     letter-spacing: .005em;
-    margin: 0 0 14px;
+    margin: 0 0 10px;
     white-space: nowrap;
     text-shadow: 0 1px 14px rgba(0, 0, 0, .35)
-}
-
-.hero-divider {
-    display: block;
-    width: 58%;
-    min-width: 72px;
-    height: 1px;
-    margin: 0 0 14px;
-    background: rgba(255, 255, 255, .9)
 }
 
 .hero-role {

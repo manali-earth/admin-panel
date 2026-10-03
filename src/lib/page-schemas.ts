@@ -29,7 +29,7 @@ export type FieldDef =
  * page's master list (copied in as an independent, freely-editable copy)
  * instead of appending a blank item. Used by Home's pinned projects /
  * pinned publications so they can only ever reference something that
- * already exists in GIS Projects / Research Publications.
+ * already exists in Projects / Research Publications.
  */
 export interface PickSource {
   masterPageKey: Exclude<PageKey, "home">;
@@ -143,7 +143,7 @@ export const homeSchema: PageSchema = {
     {
       kind: "list",
       key: "projects",
-      label: "Pinned projects (independent copies, picked from GIS Projects)",
+      label: "Pinned projects (independent copies, picked from Projects)",
       itemLabel: "Pinned project",
       itemFields: [
         { kind: "text", key: "id", label: "ID (matches a projects.json id)" },
@@ -236,7 +236,7 @@ export const PROJECT_CATEGORIES = [
 export const gisProjectsSchema: PageSchema = {
   key: "gisProjects",
   slug: "gis-projects",
-  title: "GIS Projects",
+  title: "Projects",
   fields: [
     { kind: "text", key: "title", label: "Page title" },
     { kind: "text", key: "heading", label: "Heading", as: "h1" },

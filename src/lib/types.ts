@@ -115,7 +115,7 @@ export interface ProjectItem {
   title: string;
   image?: string;
   meta?: string;
-  /** Short blurb shown on project cards (home + the GIS Projects listing). */
+  /** Short blurb shown on project cards (home + the Projects listing). */
   summary?: string;
   /** Full on-demand detail-page body — same shape as My Story's sections. */
   sections?: ContentSection[];

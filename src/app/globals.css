@@ -811,3 +811,16 @@ button.danger:hover {
   .auth-card h1 { font-size: 36px; }
   .admin-logout-btn { margin-left: 0; }
 }
+
+.html-hint {
+  margin: 0 auto 8px;
+  max-width: 960px;
+  padding: 8px 14px;
+  font-size: 12.5px;
+  color: #5b6b6d;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 6px;
+}
+.html-hint code {
+  font-size: 12px;
+}

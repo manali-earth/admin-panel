@@ -60,6 +60,24 @@ export function FieldRenderer({ pageKey, field, basePath }: FieldRendererProps) 
         </FieldShell>
       );
 
+    case "select":
+      return (
+        <FieldShell label={field.label}>
+          <select
+            className="editable-input"
+            value={(value as string) ?? ""}
+            onChange={(e) => setField(pageKey, path, e.target.value)}
+          >
+            <option value="">Choose a section…</option>
+            {field.options.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </FieldShell>
+      );
+
     case "image":
       return (
         <FieldShell label={field.label}>

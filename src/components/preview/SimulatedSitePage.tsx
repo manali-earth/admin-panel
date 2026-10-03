@@ -48,7 +48,7 @@ export function SimulatedSitePage({ schema }: { schema: PageSchema }) {
     const pageData = draft[pageKey];
     if (!pageData) return;
     const resolved = resolveImagesForPreview(pageSchema.fields, pageData, imagePreviewUrl);
-    win.postMessage({ type: "PORTFOLIO_PREVIEW_DATA", pageKey: pageSchema.slug, data: resolved }, window.location.origin);
+    win.postMessage({ type: "PORTFOLIO_PREVIEW_DATA", pageKey: pageSchema.slug, data: resolved, home: draft.home }, window.location.origin);
   }, [draft, imagePreviewUrl, setPreviewPageKey]);
 
   useEffect(() => {

@@ -17,6 +17,7 @@ export type FieldDef =
   | { kind: "text"; key: string; label: string; as?: EditableTextTag }
   | { kind: "textarea"; key: string; label: string }
   | { kind: "image"; key: string; label: string }
+  | { kind: "select"; key: string; label: string; options: { value: string; label: string }[] }
   | { kind: "stringList"; key: string; label: string; itemLabel: string }
   | { kind: "group"; key: string; label: string; fields: FieldDef[] }
   | { kind: "list"; key: string; label: string; itemLabel: string; itemFields: FieldDef[]; addFrom?: PickSource }
@@ -222,6 +223,16 @@ export const educationExperienceSchema: PageSchema = {
   ]
 };
 
+/** Keep in sync with "categories" in database/projects.json (id + label). */
+export const PROJECT_CATEGORIES = [
+  { value: "data-analysis-visualization", label: "Data analysis and visualization" },
+  { value: "gis-maps", label: "GIS maps" },
+  { value: "unocha", label: "UNOCHA project" },
+  { value: "public-health", label: "Public Health projects" },
+  { value: "academic-field", label: "Academic field projects" },
+  { value: "feasibility-study", label: "Feasibility study" }
+];
+
 export const gisProjectsSchema: PageSchema = {
   key: "gisProjects",
   slug: "gis-projects",
@@ -237,6 +248,7 @@ export const gisProjectsSchema: PageSchema = {
       itemLabel: "Project",
       itemFields: [
         { kind: "text", key: "id", label: "ID (used by ?view= links — keep unique)" },
+        { kind: "select", key: "category", label: "Project page section", options: PROJECT_CATEGORIES },
         { kind: "text", key: "title", label: "Title" },
         { kind: "image", key: "image", label: "Image (optional)" },
         { kind: "text", key: "meta", label: "Meta line" },

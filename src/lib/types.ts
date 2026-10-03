@@ -110,6 +110,8 @@ export interface HomeProjectTeaser {
 /** Shape used by projects.json's full list. */
 export interface ProjectItem {
   id: string;
+  /** Which Projects-page segment this project is listed under (an id from ProjectsData.categories). */
+  category?: string;
   title: string;
   image?: string;
   meta?: string;
@@ -193,6 +195,8 @@ export interface ProjectsData {
   title: string;
   heading: string;
   intro?: string;
+  /** Projects-page segments, in display order. */
+  categories?: { id: string; label: string }[];
   projects: ProjectItem[];
 }
 

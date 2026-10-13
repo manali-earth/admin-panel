@@ -25,7 +25,7 @@ function plain(value: unknown): string {
 }
 
 /**
- * The list page for Projects and Poster & Presentations: one card per item, with add / remove / reorder
+ * The list page for Projects and Poster presentations: one card per item, with add / remove / reorder
  * here and an "Edit content" button that opens the item's own on-demand edit page (/<page>/<id>),
  * so a long list stays a tidy overview instead of one endless inline form.
  */

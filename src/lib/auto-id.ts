@@ -10,7 +10,6 @@ import type { PageKey } from "./types";
 const ID_LISTS: Partial<Record<PageKey, string[][]>> = {
   gisProjects: [["projects"]],
   researchPublications: [["publications"]],
-  conferences: [["items"]],
   posters: [["posters"]],
   home: [["projects"], ["publications"]]
 };

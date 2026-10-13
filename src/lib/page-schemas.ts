@@ -314,21 +314,17 @@ export const researchPublicationsSchema: PageSchema = {
 export const conferencesSchema: PageSchema = {
   key: "conferences",
   slug: "conferences",
-  title: "Conferences",
+  title: "Conference & Presentations",
   fields: [
     { kind: "text", key: "title", label: "Page title" },
     { kind: "text", key: "heading", label: "Heading", as: "h1" },
+    { kind: "textarea", key: "intro", label: "Intro" },
     {
       kind: "list",
-      key: "items",
-      label: "Conferences",
-      itemLabel: "Conference",
-      autoId: true,
-      itemFields: [
-        { kind: "text", key: "title", label: "Title" },
-        { kind: "text", key: "date", label: "Date / place" },
-        { kind: "textarea", key: "details", label: "Details" }
-      ]
+      key: "sections",
+      label: "Sections",
+      itemLabel: "Section",
+      itemFields: contentSectionItemFields
     }
   ]
 };
@@ -342,7 +338,7 @@ const posterSectionItemFields: FieldDef[] = [
 export const postersSchema: PageSchema = {
   key: "posters",
   slug: "posters",
-  title: "Poster & Presentations",
+  title: "Poster presentations",
   fields: [
     { kind: "text", key: "title", label: "Page title" },
     { kind: "text", key: "heading", label: "Heading", as: "h1" },
@@ -389,7 +385,7 @@ export function schemaForKey(key: PageKey): PageSchema {
   return key === "home" ? homeSchema : dedicatedPageSchemas[key];
 }
 
-/** The list on a page that is shown as cards with per-item edit pages (Projects, Poster & Presentations), if any. */
+/** The list on a page that is shown as cards with per-item edit pages (Projects, Poster presentations), if any. */
 export function cardListField(schema: PageSchema): Extract<FieldDef, { kind: "list" }> | undefined {
   return schema.fields.find((f): f is Extract<FieldDef, { kind: "list" }> => f.kind === "list" && !!f.cards);
 }

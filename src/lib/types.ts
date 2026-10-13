@@ -130,14 +130,7 @@ export interface PublicationItem {
   link?: string;
 }
 
-export interface ConferenceItem {
-  id: string;
-  title: string;
-  date: string;
-  details?: string;
-}
-
-/** One poster or presentation: a card on the Poster & Presentations page plus its on-demand detail page. */
+/** One poster or presentation: a card on the Poster presentations page plus its on-demand detail page. */
 export interface PosterItem {
   id: string;
   title: string;
@@ -228,7 +221,8 @@ export interface ConferencesData {
   page: "conferences";
   title: string;
   heading: string;
-  items: ConferenceItem[];
+  intro?: string;
+  sections: ContentSection[];
 }
 
 export interface PostersData {

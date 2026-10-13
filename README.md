@@ -111,9 +111,9 @@ workflow at `.github/workflows/deploy.yml`.
   `gisProjects` → `photos/projects/` and `researchPublications` →
   `photos/publications/`, which don't match their own page slugs).
 
-## Card pages: Projects and Poster & Presentations
+## Card pages: Projects and Poster presentations
 
-These two pages show a grid of cards (add, delete, reorder with ← →). **Edit content** on a card opens that item's own page at `/<page>/<item id>` (e.g. `/gis-projects/project-1`, `/posters/poster-ab12cd34`), where all of its fields are edited. A page opts in with `cards: {...}` on its list field in `src/lib/page-schemas.ts`. In Poster & Presentations a section's content can also be a PDF (`allowPdf` on the `blockList` field): the PDF is staged and committed with Save like an image, and previewed with the same viewer the website uses (`public/site/pdf-viewer.js`, `public/vendor/pdfjs/`, both copied by `pnpm sync:preview`).
+These two pages show a grid of cards (add, delete, reorder with ← →). **Edit content** on a card opens that item's own page at `/<page>/<item id>` (e.g. `/gis-projects/project-1`, `/posters/poster-ab12cd34`), where all of its fields are edited. A page opts in with `cards: {...}` on its list field in `src/lib/page-schemas.ts`. In Poster presentations a section's content can also be a PDF (`allowPdf` on the `blockList` field): the PDF is staged and committed with Save like an image, and previewed with the same viewer the website uses (`public/site/pdf-viewer.js`, `public/vendor/pdfjs/`, both copied by `pnpm sync:preview`).
 
 Education & Experience has a Certificates list (image + caption).
 

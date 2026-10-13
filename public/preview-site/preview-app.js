@@ -6,11 +6,11 @@ let imageBase = ''; let siteTitle = '';
 // The top bar lives here and only here: every page has an empty <nav id="site-nav"> that is filled from this list,
 // so adding, renaming or reordering a page is one edit instead of one per HTML file.
 // (Labels are HTML, so write & as &amp;.)
-const NAV_ITEMS = [['/my-story/', 'My Story'], ['/education-experience/', 'Education &amp; Experience'], ['/projects/', 'Projects'], ['/publications/', 'Research Publications'], ['/conferences/', 'Conferences'], ['/posters/', 'Poster &amp; Presentations']];
+const NAV_ITEMS = [['/my-story/', 'My Story'], ['/education-experience/', 'Education &amp; Experience'], ['/projects/', 'Projects'], ['/publications/', 'Research Publications'], ['/conferences/', 'Conference &amp; Presentations'], ['/posters/', 'Poster presentations']];
 function navHref(h) { return '/preview-site' + h + 'index.html' } // keep nav links inside the preview
 function renderNav() { const n = $('#site-nav'); if (n) n.innerHTML = NAV_ITEMS.map(([h, label]) => `<a href="${navHref(h)}">${label}</a>`).join('') }
 renderNav();
-// PDFs on Poster & Presentations pages are drawn by /pdf-viewer.js (loaded only when a page actually has a PDF).
+// PDFs on Poster presentations pages are drawn by /pdf-viewer.js (loaded only when a page actually has a PDF).
 const PDF_VIEWER_SRC = '/site/pdf-viewer.js'
 let pdfViewerPromise = null;
 function loadPdfViewer() { if (window.PortfolioPdf) return Promise.resolve(); if (!pdfViewerPromise) pdfViewerPromise = new Promise((ok, fail) => { const s = document.createElement('script'); s.src = PDF_VIEWER_SRC; s.onload = ok; s.onerror = () => { pdfViewerPromise = null; fail(new Error('Could not load the PDF viewer')) }; document.head.appendChild(s) }); return pdfViewerPromise }
@@ -40,7 +40,7 @@ function renderBlock(b) { return b.type === 'image' ? `<figure class="section-im
 function renderSection(s) { return `${s.heading ? `<h2>${s.heading}</h2>` : ''}${(s.content || []).map(renderBlock).join('')}` }
 function renderPage(key, d) {
     document.title = plain(`${d.title} | ${siteTitle || 'Portfolio'}`); $('#page-heading').innerHTML = d.heading; const c = $('#page-content'); const view = new URLSearchParams(location.search).get('view'); if (view && view !== 'overview') { const item = findItem(d, view); if (item) { c.innerHTML = detail(item); return } }
-    if (key === 'my-story') c.innerHTML = `<div class="prose">${d.intro ? `<p>${d.intro}</p>` : ''}${(d.sections || []).map(renderSection).join('')}</div>`; if (key === 'education-experience') c.innerHTML = `<h2>Education</h2>${d.education.map(row).join('')}<h2>Experience</h2>${d.experience.map(row).join('')}${renderCertificates(d.certificates)}`; if (key === 'gis-projects') c.innerHTML = renderProjectSegments(d); if (key === 'research-publications') c.innerHTML = d.publications.map(pub).join(''); if (key === 'conferences') c.innerHTML = `<div class="conference-cards">${d.items.map(conferenceCard).join('')}</div>`; if (key === 'posters') c.innerHTML = renderPosters(d);
+    if (key === 'conferences') d = conferencesAsArticle(d); if (key === 'my-story' || key === 'conferences') c.innerHTML = `<div class="prose">${d.intro ? `<p>${d.intro}</p>` : ''}${(d.sections || []).map(renderSection).join('')}</div>`; if (key === 'education-experience') c.innerHTML = `<h2>Education</h2>${d.education.map(row).join('')}<h2>Experience</h2>${d.experience.map(row).join('')}${renderCertificates(d.certificates)}`; if (key === 'gis-projects') c.innerHTML = renderProjectSegments(d); if (key === 'research-publications') c.innerHTML = d.publications.map(pub).join(''); if (key === 'posters') c.innerHTML = renderPosters(d);
 }
 function renderCertificates(list) {
     const certs = (list || []).filter(x => x && x.image);
@@ -60,8 +60,9 @@ function renderProjectSegments(d) {
     const body = groups.map(g => `<section class="project-segment" id="seg-${g.id}"><h2>${g.label}</h2>${g.items.length ? `<div class="project-cards page-projects">${g.items.map(p => projectCard(p, '')).join('')}</div>` : `<p class="segment-empty">Projects coming soon.</p>`}</section>`).join('');
     return `<p class="section-lead">${d.intro}</p><nav class="segment-nav" aria-label="Project sections">${nav}</nav>${body}`
 }
-function conferenceCard(i) { return `<article class="conference-card"><div class="info-date">${i.date}</div><h3>${i.title}</h3><p>${i.details}</p><a href="?view=${i.id}">View conference →</a></article>` }
-function findItem(d, id) { for (const key of ['projects', 'publications', 'items', 'posters']) { const item = d[key]?.find(x => (x.id || '') === id); if (item) return item } return null }
+// Conferences are an article like My Story. Data still in the old card format (items[]) is converted on the fly.
+function conferencesAsArticle(d) { if (Array.isArray(d.sections) && d.sections.length) return d; return { ...d, sections: (d.items || []).map(i => ({ heading: i.title, content: [...(i.date ? [{ type: 'paragraph', text: `<em>${i.date}</em>` }] : []), ...(i.details ? [{ type: 'paragraph', text: i.details }] : [])] })) } }
+function findItem(d, id) { for (const key of ['projects', 'publications', 'posters']) { const item = d[key]?.find(x => (x.id || '') === id); if (item) return item } return null }
 function detail(i) { const hasSections = Array.isArray(i.sections) && i.sections.length > 0; const hasPdf = hasSections && i.sections.some(s => (s.content || []).some(b => b.type === 'pdf')); return `<article class="detail-view${hasPdf ? ' detail-wide' : ''}"><p class="detail-kicker">${i.year || i.date || i.meta || 'Portfolio detail'}</p><h2>${i.title || i.name}</h2>${i.image ? `<img class="detail-image" src="${img(i.image)}" alt="${attr(i.title)}">` : ''}${hasSections ? `${i.summary ? `<p>${i.summary}</p>` : ''}${i.sections.map(renderSection).join('')}` : `<p>${i.details || i.description || i.authors || ''}</p>`}${i.status ? `<p><strong>${i.status}</strong></p>` : ''}${i.link ? `<a class="detail-link" href="${i.link}" ${i.link.startsWith('http') ? 'target="_blank" rel="noreferrer"' : ''}>Open related link →</a>` : ''}<p class="back-link"><a href="?view=overview">← Back to overview</a></p></article>` }
 function commonFooter(person = {}) { if ($('#footer-name')) $('#footer-name').innerHTML = `© ${new Date().getFullYear()} ${person.name || ''}`; const fs = $('#footer-socials'); if (fs && person.socials) fs.innerHTML = socialLinks(person.socials) }
 function bind() { mountPdfViewers(); const b = $('.menu-button'), n = $('#site-nav'); if (b) b.addEventListener('click', () => { const open = n.classList.toggle('open'); b.setAttribute('aria-expanded', open) }); $$('#site-nav a').forEach(a => a.addEventListener('click', () => n.classList.remove('open'))) }

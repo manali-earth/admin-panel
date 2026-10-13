@@ -10,8 +10,8 @@ const NAV_ITEMS = [
   { href: "/education-experience", label: "Education & Experience" },
   { href: "/gis-projects", label: "Projects" },
   { href: "/research-publications", label: "Publications" },
-  { href: "/conferences", label: "Conferences" },
-  { href: "/posters", label: "Poster & Presentations" }
+  { href: "/conferences", label: "Conference & Presentations" },
+  { href: "/posters", label: "Poster presentations" }
 ];
 
 export function TopNav() {

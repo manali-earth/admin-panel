@@ -12,7 +12,7 @@ interface BlockListEditorProps {
   pageKey: PageKey;
   path: FieldPath;
   blocks: ContentBlock[];
-  /** Offer "+ Add PDF" next to "+ Add paragraph" / "+ Add image" (Poster & Presentations). */
+  /** Offer "+ Add PDF" next to "+ Add paragraph" / "+ Add image" (Poster presentations). */
   allowPdf?: boolean;
 }
 

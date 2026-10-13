@@ -20,9 +20,34 @@ export type FieldDef =
   | { kind: "select"; key: string; label: string; options: { value: string; label: string }[] }
   | { kind: "stringList"; key: string; label: string; itemLabel: string }
   | { kind: "group"; key: string; label: string; fields: FieldDef[] }
-  | { kind: "list"; key: string; label: string; itemLabel: string; itemFields: FieldDef[]; addFrom?: PickSource; autoId?: boolean }
-  /** An ordered, article-style mix of paragraph and image blocks — see BlockListEditor. */
-  | { kind: "blockList"; key: string; label: string };
+  | {
+      kind: "list";
+      key: string;
+      label: string;
+      itemLabel: string;
+      itemFields: FieldDef[];
+      addFrom?: PickSource;
+      autoId?: boolean;
+      /**
+       * Show the list as a grid of cards (add / remove / reorder here) and edit each item's
+       * `itemFields` on its own on-demand page, /<page-slug>/<item id> — see CardGrid and ItemEditor.
+       */
+      cards?: CardsConfig;
+    }
+  /** An ordered, article-style mix of paragraph and image blocks (and PDFs when `allowPdf`) — see BlockListEditor. */
+  | { kind: "blockList"; key: string; label: string; allowPdf?: boolean };
+
+/** How an item of a card-style list is summarised on its card (which of its fields to show). */
+export interface CardsConfig {
+  /** Title given to a freshly added item, e.g. "Untitled project". */
+  newItemTitle: string;
+  titleKey: string;
+  imageKey?: string;
+  metaKey?: string;
+  summaryKey?: string;
+  /** A "select" field whose chosen option's label is shown as a badge on the card. */
+  badgeKey?: string;
+}
 
 /**
  * Lets a "list" field's "+ Add" action pick an existing item from another
@@ -212,12 +237,22 @@ export const myStorySchema: PageSchema = {
 export const educationExperienceSchema: PageSchema = {
   key: "educationExperience",
   slug: "education-experience",
-  title: "Education and Experience",
+  title: "Education & Experience",
   fields: [
     { kind: "text", key: "title", label: "Page title" },
     { kind: "text", key: "heading", label: "Heading", as: "h1" },
     { kind: "list", key: "education", label: "Education", itemLabel: "Entry", itemFields: timelineItemFields },
-    { kind: "list", key: "experience", label: "Experience", itemLabel: "Entry", itemFields: timelineItemFields }
+    { kind: "list", key: "experience", label: "Experience", itemLabel: "Entry", itemFields: timelineItemFields },
+    {
+      kind: "list",
+      key: "certificates",
+      label: "Certificates (shown below Experience)",
+      itemLabel: "Certificate",
+      itemFields: [
+        { kind: "image", key: "image", label: "Certificate image" },
+        { kind: "text", key: "caption", label: "Caption" }
+      ]
+    }
   ]
 };
 
@@ -228,7 +263,8 @@ export const PROJECT_CATEGORIES = [
   { value: "unocha", label: "UNOCHA project" },
   { value: "public-health", label: "Public Health projects" },
   { value: "academic-field", label: "Academic field projects" },
-  { value: "feasibility-study", label: "Feasibility study" }
+  { value: "feasibility-study", label: "Feasibility study" },
+  { value: "research-projects", label: "Research projects" }
 ];
 
 export const gisProjectsSchema: PageSchema = {
@@ -245,6 +281,7 @@ export const gisProjectsSchema: PageSchema = {
       label: "Projects",
       itemLabel: "Project",
       autoId: true,
+      cards: { newItemTitle: "Untitled project", titleKey: "title", imageKey: "image", metaKey: "meta", summaryKey: "summary", badgeKey: "category" },
       itemFields: [
         { kind: "select", key: "category", label: "Project page section", options: PROJECT_CATEGORIES },
         { kind: "text", key: "title", label: "Title" },
@@ -296,24 +333,39 @@ export const conferencesSchema: PageSchema = {
   ]
 };
 
-export const leadershipSchema: PageSchema = {
-  key: "leadership",
-  slug: "leadership",
-  title: "Leadership",
+/** Posters' detail-page sections: like a project's, but each section can also hold uploaded PDFs. */
+const posterSectionItemFields: FieldDef[] = [
+  { kind: "text", key: "heading", label: "Section heading" },
+  { kind: "blockList", key: "content", label: "Content", allowPdf: true }
+];
+
+export const postersSchema: PageSchema = {
+  key: "posters",
+  slug: "posters",
+  title: "Poster & Presentations",
   fields: [
     { kind: "text", key: "title", label: "Page title" },
     { kind: "text", key: "heading", label: "Heading", as: "h1" },
     { kind: "textarea", key: "intro", label: "Intro" },
     {
       kind: "list",
-      key: "items",
-      label: "Leadership & volunteer items",
-      itemLabel: "Item",
+      key: "posters",
+      label: "Posters & presentations",
+      itemLabel: "Poster",
       autoId: true,
+      cards: { newItemTitle: "Untitled poster", titleKey: "title", imageKey: "image", metaKey: "meta", summaryKey: "summary" },
       itemFields: [
         { kind: "text", key: "title", label: "Title" },
-        { kind: "text", key: "date", label: "Date" },
-        { kind: "textarea", key: "details", label: "Details" }
+        { kind: "text", key: "meta", label: "Event / date line" },
+        { kind: "image", key: "image", label: "Card image (optional)" },
+        { kind: "textarea", key: "summary", label: "Card summary (shown on the poster's card)" },
+        {
+          kind: "list",
+          key: "sections",
+          label: "Detail page sections",
+          itemLabel: "Section",
+          itemFields: posterSectionItemFields
+        }
       ]
     }
   ]
@@ -326,7 +378,7 @@ export const dedicatedPageSchemas: Record<Exclude<PageKey, "home">, PageSchema> 
   gisProjects: gisProjectsSchema,
   researchPublications: researchPublicationsSchema,
   conferences: conferencesSchema,
-  leadership: leadershipSchema
+  posters: postersSchema
 };
 
 export function schemaForSlug(slug: PageSlug): PageSchema | undefined {
@@ -335,4 +387,9 @@ export function schemaForSlug(slug: PageSlug): PageSchema | undefined {
 
 export function schemaForKey(key: PageKey): PageSchema {
   return key === "home" ? homeSchema : dedicatedPageSchemas[key];
+}
+
+/** The list on a page that is shown as cards with per-item edit pages (Projects, Poster & Presentations), if any. */
+export function cardListField(schema: PageSchema): Extract<FieldDef, { kind: "list" }> | undefined {
+  return schema.fields.find((f): f is Extract<FieldDef, { kind: "list" }> => f.kind === "list" && !!f.cards);
 }

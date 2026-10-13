@@ -6,6 +6,7 @@ import type { ContentBlock, PageKey } from "@/lib/types";
 import { getAtPath } from "@/lib/object-path";
 import { type FieldPath, useContentStore } from "@/store/content-store";
 import { BlockListEditor } from "./BlockListEditor";
+import { CardGrid } from "./CardGrid";
 import { EditableImage } from "./EditableImage";
 import { EditableText } from "./EditableText";
 import { EditableTextarea } from "./EditableTextarea";
@@ -32,7 +33,7 @@ export function FieldRenderer({ pageKey, field, basePath }: FieldRendererProps) 
   const addListItem = useContentStore((s) => s.addListItem);
   const removeListItemAt = useContentStore((s) => s.removeListItemAt);
   const moveListItem = useContentStore((s) => s.moveListItem);
-  const stageImage = useContentStore((s) => s.stageImage);
+  const stageFile = useContentStore((s) => s.stageFile);
   const imagePreviewUrl = useContentStore((s) => s.imagePreviewUrl);
 
   if (!page) return null;
@@ -81,7 +82,7 @@ export function FieldRenderer({ pageKey, field, basePath }: FieldRendererProps) 
     case "image":
       return (
         <FieldShell label={field.label}>
-          <EditableImage src={imagePreviewUrl(value as string | undefined)} onFile={(file) => stageImage(pageKey, path, file)} />
+          <EditableImage src={imagePreviewUrl(value as string | undefined)} onFile={(file) => stageFile(pageKey, path, file)} />
         </FieldShell>
       );
 
@@ -110,6 +111,13 @@ export function FieldRenderer({ pageKey, field, basePath }: FieldRendererProps) 
       );
 
     case "list":
+      if (field.cards) {
+        return (
+          <FieldShell label={field.label}>
+            <CardGrid pageKey={pageKey} path={path} items={(value as unknown[]) ?? []} field={field} />
+          </FieldShell>
+        );
+      }
       return (
         <FieldShell label={field.label}>
           <ListEditor
@@ -127,7 +135,7 @@ export function FieldRenderer({ pageKey, field, basePath }: FieldRendererProps) 
     case "blockList":
       return (
         <FieldShell label={field.label}>
-          <BlockListEditor pageKey={pageKey} path={path} blocks={(value as ContentBlock[]) ?? []} />
+          <BlockListEditor pageKey={pageKey} path={path} blocks={(value as ContentBlock[]) ?? []} allowPdf={field.allowPdf} />
         </FieldShell>
       );
 

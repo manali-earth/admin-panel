@@ -26,8 +26,8 @@ export function resolveImagesForPreview<T>(fields: FieldDef[], data: T, resolve:
       } else if (field.kind === "blockList") {
         const blocks = (getAtPath(result, path) as Array<{ type: string }>) ?? [];
         blocks.forEach((block, idx) => {
-          if (block.type !== "image") return;
-          const imagePath = [...path, idx, "image"];
+          if (block.type !== "image" && block.type !== "pdf") return;
+          const imagePath = [...path, idx, block.type === "pdf" ? "pdf" : "image"];
           const current = getAtPath(result, imagePath) as string | undefined;
           const resolved = resolve(current);
           if (resolved !== current) result = setAtPath(result, imagePath, resolved ?? "");

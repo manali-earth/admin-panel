@@ -11,7 +11,7 @@ const NAV_ITEMS = [
   { href: "/gis-projects", label: "Projects" },
   { href: "/research-publications", label: "Publications" },
   { href: "/conferences", label: "Conferences" },
-  { href: "/leadership", label: "Leadership" }
+  { href: "/posters", label: "Poster & Presentations" }
 ];
 
 export function TopNav() {

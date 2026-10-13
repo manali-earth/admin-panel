@@ -6,5 +6,5 @@
   "gisProjects": "/database/projects.json",
   "researchPublications": "/database/publications.json",
   "conferences": "/database/conferences.json",
-  "leadership": "/database/leadership.json"
+  "posters": "/database/posters.json"
 }

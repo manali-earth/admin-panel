@@ -7,7 +7,7 @@ export const PAGE_FILENAMES: Record<PageKey, string> = {
   gisProjects: "projects.json",
   researchPublications: "publications.json",
   conferences: "conferences.json",
-  leadership: "leadership.json"
+  posters: "posters.json"
 };
 
 /**
@@ -22,5 +22,5 @@ export const PHOTO_FOLDER: Record<PageKey, string> = {
   gisProjects: "projects",
   researchPublications: "publications",
   conferences: "conferences",
-  leadership: "leadership"
+  posters: "posters"
 };

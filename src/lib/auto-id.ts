@@ -11,7 +11,7 @@ const ID_LISTS: Partial<Record<PageKey, string[][]>> = {
   gisProjects: [["projects"]],
   researchPublications: [["publications"]],
   conferences: [["items"]],
-  leadership: [["items"]],
+  posters: [["posters"]],
   home: [["projects"], ["publications"]]
 };
 

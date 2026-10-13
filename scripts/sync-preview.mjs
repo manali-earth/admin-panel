@@ -12,6 +12,8 @@
 //   public/preview-site/preview-app.js  <- website app.js, fed by postMessage instead of fetch()
 //   public/site/styles.css              <- website styles.css for the admin chrome, with the three
 //                                          design tokens that collide with the admin's own renamed
+//   public/site/pdf-viewer.js           <- website pdf-viewer.js (draws PDFs in the editor and the preview)
+//   public/vendor/pdfjs/                <- website vendor/pdfjs (the PDF.js build pdf-viewer.js uses)
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -67,6 +69,17 @@ for (const d of fs.readdirSync(siteDir, { withFileTypes: true })) {
   const f = path.join(siteDir, d.name, "index.html");
   if (d.isDirectory() && fs.existsSync(f)) pages.push([d.name, f]);
 }
+// Drop preview pages whose folder no longer exists on the website (e.g. a page that was renamed).
+const keep = new Set(pages.map(([folder]) => folder));
+const previewRoot = path.join(pub, "preview-site");
+if (fs.existsSync(previewRoot)) {
+  for (const d of fs.readdirSync(previewRoot, { withFileTypes: true })) {
+    if (d.isDirectory() && !keep.has(d.name)) {
+      fs.rmSync(path.join(previewRoot, d.name), { recursive: true, force: true });
+      console.log("removed stale preview page", d.name);
+    }
+  }
+}
 for (const [folder, file] of pages) {
   const html = read(file)
     .replace(/href="\/styles\.css"/g, 'href="/preview-site/styles.css"')
@@ -77,6 +90,17 @@ for (const [folder, file] of pages) {
   write(path.join(pub, "preview-site", folder, "index.html"), html);
 }
 
+// ---- PDF viewer + the PDF.js build it loads (same files, same URLs: /vendor/pdfjs/ is root-relative on both sites)
+must(fs.existsSync(path.join(siteDir, "pdf-viewer.js")), "no pdf-viewer.js in the website");
+write(path.join(pub, "site/pdf-viewer.js"), read(path.join(siteDir, "pdf-viewer.js")));
+const vendorDir = path.join(siteDir, "vendor/pdfjs");
+must(fs.existsSync(vendorDir), "no vendor/pdfjs in the website");
+for (const f of fs.readdirSync(vendorDir)) {
+  fs.mkdirSync(path.join(pub, "vendor/pdfjs"), { recursive: true });
+  fs.copyFileSync(path.join(vendorDir, f), path.join(pub, "vendor/pdfjs", f));
+  console.log("wrote", path.join("public/vendor/pdfjs", f));
+}
+
 // ---- app.js -> preview-app.js
 let js = read(path.join(siteDir, "app.js"));
 const sub = (re, to, what) => {
@@ -85,6 +109,9 @@ const sub = (re, to, what) => {
 };
 sub(/^function img\(p\).*$/m, "function img(p) { return p || '' } // the admin pre-resolves image paths (incl. blob: URLs for unsaved uploads)\nconst PROJECTS_PAGE_HREF = '/preview-site/projects/index.html'", "img()");
 sub(/projectCard\(p, '\/projects\/'\)/, "projectCard(p, PROJECTS_PAGE_HREF)", "the home project-card link");
+// The top bar is built by app.js from NAV_ITEMS; inside the preview its links must stay inside the preview.
+sub(/^function navHref\(h\).*$/m, "function navHref(h) { return '/preview-site' + h + 'index.html' } // keep nav links inside the preview", "navHref()");
+sub(/^const PDF_VIEWER_SRC = .*$/m, "const PDF_VIEWER_SRC = '/site/pdf-viewer.js'", "PDF_VIEWER_SRC");
 sub(/^async function load\(\).*$/m, "", "load()");
 sub(/^load\(\);?\s*$/m, "", "the load() call");
 js =

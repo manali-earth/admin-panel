@@ -14,7 +14,7 @@ export interface DatabaseIndex {
   gisProjects: string;
   researchPublications: string;
   conferences: string;
-  leadership: string;
+  posters: string;
 }
 
 /** The seven page-data keys, in database.json / dbKey form. */
@@ -25,7 +25,7 @@ export type PageKey =
   | "gisProjects"
   | "researchPublications"
   | "conferences"
-  | "leadership";
+  | "posters";
 
 /** The site's own kebab-case slugs (HTML data-page / URL folder names). */
 export type PageSlug =
@@ -35,7 +35,7 @@ export type PageSlug =
   | "gis-projects"
   | "research-publications"
   | "conferences"
-  | "leadership";
+  | "posters";
 
 export const SLUG_TO_PAGE_KEY: Record<PageSlug, PageKey> = {
   home: "home",
@@ -44,7 +44,7 @@ export const SLUG_TO_PAGE_KEY: Record<PageSlug, PageKey> = {
   "gis-projects": "gisProjects",
   "research-publications": "researchPublications",
   conferences: "conferences",
-  leadership: "leadership"
+  posters: "posters"
 };
 
 export const PAGE_KEY_TO_SLUG: Record<PageKey, PageSlug> = {
@@ -54,7 +54,7 @@ export const PAGE_KEY_TO_SLUG: Record<PageKey, PageSlug> = {
   gisProjects: "gis-projects",
   researchPublications: "research-publications",
   conferences: "conferences",
-  leadership: "leadership"
+  posters: "posters"
 };
 
 /**
@@ -70,7 +70,7 @@ export const PAGE_KEY_TO_SITE_FOLDER: Record<PageKey, string> = {
   gisProjects: "projects",
   researchPublications: "publications",
   conferences: "conferences",
-  leadership: "leadership"
+  posters: "posters"
 };
 
 export interface SocialLink {
@@ -137,15 +137,31 @@ export interface ConferenceItem {
   details?: string;
 }
 
-export interface LeadershipItem {
+/** One poster or presentation: a card on the Poster & Presentations page plus its on-demand detail page. */
+export interface PosterItem {
   id: string;
   title: string;
-  date: string;
-  details?: string;
+  image?: string;
+  /** Venue / date line shown on the card and above the detail title. */
+  meta?: string;
+  /** Short blurb shown on the poster's card. */
+  summary?: string;
+  /** Detail-page body — same shape as project sections, but blocks may also be PDFs. */
+  sections?: ContentSection[];
+}
+
+/** An uploaded certificate image (Education & Experience page). */
+export interface CertificateItem {
+  image: string;
+  caption?: string;
 }
 
 /** One piece of a section's body, in the order it should appear — an article-style mix of text and photos. */
-export type ContentBlock = { type: "paragraph"; text: string } | { type: "image"; image: string; alt?: string };
+export type ContentBlock =
+  | { type: "paragraph"; text: string }
+  | { type: "image"; image: string; alt?: string }
+  /** An uploaded PDF (posters only): page 1 is shown in full, the rest scroll. `caption` sits underneath. */
+  | { type: "pdf"; pdf: string; caption?: string };
 
 /** A repeatable content block used by both My Story and Project detail pages. */
 export interface ContentSection {
@@ -188,6 +204,7 @@ export interface EducationExperienceData {
   heading: string;
   education: TimelineEntry[];
   experience: TimelineEntry[];
+  certificates?: CertificateItem[];
 }
 
 export interface ProjectsData {
@@ -214,12 +231,12 @@ export interface ConferencesData {
   items: ConferenceItem[];
 }
 
-export interface LeadershipData {
-  page: "leadership";
+export interface PostersData {
+  page: "posters";
   title: string;
   heading: string;
   intro?: string;
-  items: LeadershipItem[];
+  posters: PosterItem[];
 }
 
 export type PageDataMap = {
@@ -229,7 +246,7 @@ export type PageDataMap = {
   gisProjects: ProjectsData;
   researchPublications: PublicationsData;
   conferences: ConferencesData;
-  leadership: LeadershipData;
+  posters: PostersData;
 };
 
 export type AnyPageData = PageDataMap[PageKey];

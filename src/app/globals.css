@@ -835,3 +835,220 @@ button.danger:hover {
   min-height: 0;
   line-height: inherit;
 }
+
+/* --- Card pages (Projects, Poster & Presentations) ------------------------ */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+  align-items: stretch;
+}
+
+.card-grid-item {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: #fff;
+  overflow: hidden;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+
+.card-grid-item:hover,
+.card-grid-item:focus-within {
+  border-color: var(--moss);
+  box-shadow: 0 2px 10px rgba(43, 43, 36, 0.1);
+}
+
+.card-grid-thumb img,
+.card-grid-noimg {
+  display: block;
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.card-grid-noimg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  text-align: center;
+  background: var(--moss-soft);
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.card-grid-body {
+  flex: 1;
+  padding: 12px 14px 8px;
+  min-width: 0;
+}
+
+.card-grid-body h3 {
+  margin: 0 0 4px;
+  font: 600 19px/1.2 var(--font-heading);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.card-grid-body small {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-soft);
+}
+
+.card-grid-body p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-grid-badge {
+  display: inline-block;
+  margin-bottom: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--moss-soft);
+  color: var(--moss-dark);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.card-grid-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.card-grid-edit {
+  padding: 6px 12px;
+  border: 1px solid var(--moss);
+  border-radius: 3px;
+  background: var(--moss);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.card-grid-edit:hover {
+  background: var(--moss-dark);
+  border-color: var(--moss-dark);
+}
+
+.card-grid-add {
+  min-height: 150px;
+  border: 2px dashed var(--line);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--moss-dark);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.12s, background-color 0.12s;
+}
+
+.card-grid-add span {
+  font-size: 20px;
+  margin-right: 4px;
+}
+
+.card-grid-add:hover {
+  border-color: var(--moss);
+  background: var(--moss-soft);
+}
+
+.list-item-actions button.danger,
+.card-grid-actions .danger {
+  color: var(--clay);
+}
+
+/* On-demand edit page of one card */
+
+.item-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: min(1040px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 18px 0 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.item-page-back,
+.item-page-missing a {
+  color: var(--moss-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.item-page-back:hover,
+.item-page-missing a:hover {
+  text-decoration: underline;
+}
+
+.item-page-kind {
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 10px;
+}
+
+.item-page-missing {
+  padding: 70px 24px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+/* PDF blocks in the editor (the PDF window itself is styled by the site's own styles.css) */
+
+.block-pdf {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.block-pdf-caption {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.editable-pdf-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  background: var(--moss-soft);
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+}
+
+.editable-pdf-actions {
+  margin-top: 8px;
+}
+
+.pdf-preview .pdf-meta,
+.pdf-preview .pdf-error {
+  font-family: var(--font-mono);
+}

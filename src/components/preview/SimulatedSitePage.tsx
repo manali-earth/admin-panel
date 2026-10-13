@@ -14,9 +14,10 @@ function schemaForPageKey(key: PageKey): PageSchema {
   return key === "home" ? homeSchema : dedicatedPageSchemas[key as Exclude<PageKey, "home">];
 }
 
-function previewSrcFor(schema: PageSchema): string {
+function previewSrcFor(schema: PageSchema, viewId?: string): string {
   const folder = PAGE_KEY_TO_SITE_FOLDER[schema.key];
-  return folder ? `/preview-site/${folder}/index.html` : "/preview-site/index.html";
+  const base = folder ? `/preview-site/${folder}/index.html` : "/preview-site/index.html";
+  return viewId ? `${base}?view=${encodeURIComponent(viewId)}` : base;
 }
 
 function pageKeyForPreviewPath(pathname: string): PageKey | null {
@@ -26,7 +27,8 @@ function pageKeyForPreviewPath(pathname: string): PageKey | null {
   return FOLDER_TO_PAGE_KEY[folder] ?? null;
 }
 
-export function SimulatedSitePage({ schema }: { schema: PageSchema }) {
+/** `viewId` opens the item's on-demand page (the site's ?view=<id>) instead of the page overview. */
+export function SimulatedSitePage({ schema, viewId }: { schema: PageSchema; viewId?: string }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const draft = useContentStore((s) => s.draft);
   const imagePreviewUrl = useContentStore((s) => s.imagePreviewUrl);
@@ -59,8 +61,8 @@ export function SimulatedSitePage({ schema }: { schema: PageSchema }) {
     <div className="simulated-site">
       <iframe
         ref={iframeRef}
-        key={previewSrcFor(schema)}
-        src={previewSrcFor(schema)}
+        key={previewSrcFor(schema, viewId)}
+        src={previewSrcFor(schema, viewId)}
         title="Live site preview"
         className="simulated-site-frame"
         onLoad={postCurrentPage}

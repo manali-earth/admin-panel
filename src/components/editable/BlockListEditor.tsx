@@ -4,6 +4,7 @@ import type { ContentBlock } from "@/lib/types";
 import type { PageKey } from "@/lib/types";
 import { type FieldPath, useContentStore } from "@/store/content-store";
 import { EditableImage } from "./EditableImage";
+import { EditablePdf } from "./EditablePdf";
 import { EditableText } from "./EditableText";
 import { EditableTextarea } from "./EditableTextarea";
 
@@ -11,6 +12,8 @@ interface BlockListEditorProps {
   pageKey: PageKey;
   path: FieldPath;
   blocks: ContentBlock[];
+  /** Offer "+ Add PDF" next to "+ Add paragraph" / "+ Add image" (Poster & Presentations). */
+  allowPdf?: boolean;
 }
 
 /**
@@ -18,12 +21,14 @@ interface BlockListEditorProps {
  * not two separate zones. "+ Add paragraph" and "+ Add image" both append to
  * the end of the same array, in whichever order you click them.
  */
-export function BlockListEditor({ pageKey, path, blocks }: BlockListEditorProps) {
+const BLOCK_LABEL = { paragraph: "Paragraph", image: "Image", pdf: "PDF" } as const;
+
+export function BlockListEditor({ pageKey, path, blocks, allowPdf }: BlockListEditorProps) {
   const setField = useContentStore((s) => s.setField);
   const addListItem = useContentStore((s) => s.addListItem);
   const removeListItemAt = useContentStore((s) => s.removeListItemAt);
   const moveListItem = useContentStore((s) => s.moveListItem);
-  const stageImage = useContentStore((s) => s.stageImage);
+  const stageFile = useContentStore((s) => s.stageFile);
   const imagePreviewUrl = useContentStore((s) => s.imagePreviewUrl);
 
   return (
@@ -33,7 +38,7 @@ export function BlockListEditor({ pageKey, path, blocks }: BlockListEditorProps)
         // eslint-disable-next-line react/no-array-index-key
         <div className="block-item" key={index}>
           <div className="block-item-controls">
-            <span className="block-item-type">{block.type === "paragraph" ? "Paragraph" : "Image"}</span>
+            <span className="block-item-type">{BLOCK_LABEL[block.type]}</span>
             <div className="list-item-actions">
               <button
                 type="button"
@@ -58,13 +63,23 @@ export function BlockListEditor({ pageKey, path, blocks }: BlockListEditorProps)
           </div>
           {block.type === "paragraph" ? (
             <EditableTextarea value={block.text} onCommit={(v) => setField(pageKey, [...path, index, "text"], v)} placeholder="Paragraph text" />
+          ) : block.type === "pdf" ? (
+            <div className="block-pdf">
+              <EditablePdf src={imagePreviewUrl(block.pdf)} onFile={(file) => stageFile(pageKey, [...path, index, "pdf"], file)} />
+              <EditableText
+                value={block.caption ?? ""}
+                onCommit={(v) => setField(pageKey, [...path, index, "caption"], v)}
+                placeholder="Caption (shown under the PDF)"
+                className="block-pdf-caption"
+              />
+            </div>
           ) : (
             <div className="block-image">
-              <EditableImage src={imagePreviewUrl(block.image)} onFile={(file) => stageImage(pageKey, [...path, index, "image"], file)} />
+              <EditableImage src={imagePreviewUrl(block.image)} onFile={(file) => stageFile(pageKey, [...path, index, "image"], file)} />
               <EditableText
                 value={block.alt ?? ""}
                 onCommit={(v) => setField(pageKey, [...path, index, "alt"], v)}
-                placeholder="Alt text"
+                placeholder="Caption (also used as alt text)"
                 className="block-image-alt"
               />
             </div>
@@ -78,6 +93,11 @@ export function BlockListEditor({ pageKey, path, blocks }: BlockListEditorProps)
         <button type="button" className="add-item-btn" onClick={() => addListItem(pageKey, path, { type: "image", image: "", alt: "" })}>
           + Add image
         </button>
+        {allowPdf && (
+          <button type="button" className="add-item-btn" onClick={() => addListItem(pageKey, path, { type: "pdf", pdf: "", caption: "" })}>
+            + Add PDF
+          </button>
+        )}
       </div>
     </div>
   );

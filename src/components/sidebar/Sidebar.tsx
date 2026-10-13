@@ -11,7 +11,9 @@ function hrefForPageKey(key: PageKey): string {
   return slug === "home" ? "/" : `/${slug}`;
 }
 
-export function Sidebar({ pageKey }: { pageKey: PageKey }) {
+const DEFAULT_HINT = "Add, edit, delete, and reorder items directly in the content — hover any item for its controls.";
+
+export function Sidebar({ pageKey, hint = DEFAULT_HINT }: { pageKey: PageKey; hint?: string }) {
   const router = useRouter();
   const previewMode = useContentStore((s) => s.previewMode);
   const previewPageKey = useContentStore((s) => s.previewPageKey);
@@ -63,7 +65,7 @@ export function Sidebar({ pageKey }: { pageKey: PageKey }) {
           {!previewMode && pageKey && (
             <div className="sidebar-section">
               <div className="sidebar-section-title">On this page</div>
-              <p className="sidebar-hint">Add, edit, delete, and reorder items directly in the content — hover any item for its controls.</p>
+              <p className="sidebar-hint">{hint}</p>
             </div>
           )}
         </>

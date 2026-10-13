@@ -57,7 +57,8 @@ interface ContentStore {
   removeListItemAt: (key: PageKey, path: FieldPath, index: number) => void;
   removeListItemById: (key: PageKey, path: FieldPath, id: string) => void;
   moveListItem: (key: PageKey, path: FieldPath, from: number, to: number) => void;
-  stageImage: (key: PageKey, path: FieldPath, file: File) => Promise<void>;
+  /** Stages an uploaded image or PDF; it is committed with the next Save. */
+  stageFile: (key: PageKey, path: FieldPath, file: File) => Promise<void>;
 
   isDirty: () => boolean;
   canUndo: () => boolean;
@@ -142,7 +143,7 @@ export const useContentStore = create<ContentStore>((set, get) => ({
 
   moveListItem: (key, path, from, to) => mutate(set, get, key, (data) => moveAtPath(data, path, from, to)),
 
-  stageImage: async (key, path, file) => {
+  stageFile: async (key, path, file) => {
     const folder = PHOTO_FOLDER[key];
     const filename = generateImageFilename(file.name);
     const jsonValue = `${folder}/${filename}`;

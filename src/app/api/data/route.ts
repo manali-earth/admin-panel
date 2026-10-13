@@ -10,7 +10,7 @@ const PAGE_KEYS: PageKey[] = [
   "gisProjects",
   "researchPublications",
   "conferences",
-  "leadership"
+  "posters"
 ];
 
 export async function GET(request: Request) {

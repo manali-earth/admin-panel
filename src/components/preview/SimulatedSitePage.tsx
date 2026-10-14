@@ -21,7 +21,9 @@ function previewSrcFor(schema: PageSchema, viewId?: string): string {
 }
 
 function pageKeyForPreviewPath(pathname: string): PageKey | null {
-  const match = pathname.match(/^\/preview-site\/(?:([\w-]+)\/)?index\.html$/);
+  // Cloudflare's static-asset handler redirects /preview-site/<page>/index.html to /preview-site/<page>/,
+  // so the iframe's pathname may or may not end in index.html. Accept both.
+  const match = pathname.match(/^\/preview-site\/(?:([\w-]+)\/)?(?:index\.html)?$/);
   if (!match) return null;
   const folder = match[1] ?? "";
   return FOLDER_TO_PAGE_KEY[folder] ?? null;

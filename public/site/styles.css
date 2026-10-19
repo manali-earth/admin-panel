@@ -1033,3 +1033,26 @@ button:focus-visible {
     padding: 10px 12px;
     text-align: center
 }
+
+/* Seminars & Conferences: cap image height without cropping. Each image keeps its own aspect ratio,
+   so a tall image gets narrower instead of being cut off or stretched. */
+[data-page="conferences"] .section-image {
+    width: fit-content;
+    max-width: 100%;
+    margin: 22px auto;
+    background: transparent
+}
+
+[data-page="conferences"] .section-image img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: min(420px, 70vh);
+    margin: 0 auto;
+    object-fit: contain
+}
+
+[data-page="conferences"] .section-image figcaption {
+    max-width: 100%
+}

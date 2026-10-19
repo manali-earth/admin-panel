@@ -314,7 +314,7 @@ export const researchPublicationsSchema: PageSchema = {
 export const conferencesSchema: PageSchema = {
   key: "conferences",
   slug: "conferences",
-  title: "Seminar & presentation",
+  title: "Seminars & Conferences",
   fields: [
     { kind: "text", key: "title", label: "Page title" },
     { kind: "text", key: "heading", label: "Heading", as: "h1" },

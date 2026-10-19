@@ -10,7 +10,7 @@ const NAV_ITEMS = [
   { href: "/education-experience", label: "Education & Experience" },
   { href: "/gis-projects", label: "Projects" },
   { href: "/research-publications", label: "Publications" },
-  { href: "/conferences", label: "Seminar & presentation" },
+  { href: "/conferences", label: "Seminars & Conferences" },
   { href: "/posters", label: "Poster presentations" }
 ];
 

@@ -262,7 +262,7 @@ export const PROJECT_CATEGORIES = [
   { value: "gis-maps", label: "GIS maps" },
   { value: "unocha", label: "UNOCHA project" },
   { value: "public-health", label: "Public Health projects" },
-  { value: "academic-field", label: "Academic field projects" },
+  { value: "academic-field", label: "Academic fieldworks" },
   { value: "feasibility-study", label: "Feasibility study" },
   { value: "research-projects", label: "Research projects" }
 ];
@@ -314,7 +314,7 @@ export const researchPublicationsSchema: PageSchema = {
 export const conferencesSchema: PageSchema = {
   key: "conferences",
   slug: "conferences",
-  title: "Conference & Presentations",
+  title: "Seminar & presentation",
   fields: [
     { kind: "text", key: "title", label: "Page title" },
     { kind: "text", key: "heading", label: "Heading", as: "h1" },

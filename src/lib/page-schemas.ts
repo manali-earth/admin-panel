@@ -17,7 +17,14 @@ export type FieldDef =
   | { kind: "text"; key: string; label: string; as?: EditableTextTag }
   | { kind: "textarea"; key: string; label: string }
   | { kind: "image"; key: string; label: string }
-  | { kind: "select"; key: string; label: string; options: { value: string; label: string }[] }
+  | {
+      kind: "select";
+      key: string;
+      label: string;
+      options?: { value: string; label: string }[];
+      /** Options read from the page's own current data instead of a fixed list, e.g. the Projects page's sections. */
+      optionsFrom?: { path: string[]; valueKey: string; labelKey: string };
+    }
   | { kind: "stringList"; key: string; label: string; itemLabel: string }
   | { kind: "group"; key: string; label: string; fields: FieldDef[] }
   | {
@@ -256,17 +263,6 @@ export const educationExperienceSchema: PageSchema = {
   ]
 };
 
-/** Keep in sync with "categories" in database/projects.json (id + label). */
-export const PROJECT_CATEGORIES = [
-  { value: "data-analysis-visualization", label: "Data analysis and visualization" },
-  { value: "gis-maps", label: "GIS maps" },
-  { value: "unocha", label: "UNOCHA project" },
-  { value: "public-health", label: "Public Health projects" },
-  { value: "academic-field", label: "Academic fieldworks" },
-  { value: "feasibility-study", label: "Feasibility study" },
-  { value: "research-projects", label: "Research projects" }
-];
-
 export const gisProjectsSchema: PageSchema = {
   key: "gisProjects",
   slug: "gis-projects",
@@ -277,13 +273,21 @@ export const gisProjectsSchema: PageSchema = {
     { kind: "textarea", key: "intro", label: "Intro" },
     {
       kind: "list",
+      key: "categories",
+      label: "Project page sections (the groups the projects are listed under — add, rename, reorder or remove them)",
+      itemLabel: "Section",
+      autoId: true,
+      itemFields: [{ kind: "text", key: "label", label: "Section name" }]
+    },
+    {
+      kind: "list",
       key: "projects",
       label: "Projects",
       itemLabel: "Project",
       autoId: true,
       cards: { newItemTitle: "Untitled project", titleKey: "title", imageKey: "image", metaKey: "meta", summaryKey: "summary", badgeKey: "category" },
       itemFields: [
-        { kind: "select", key: "category", label: "Project page section", options: PROJECT_CATEGORIES },
+        { kind: "select", key: "category", label: "Project page section", optionsFrom: { path: ["categories"], valueKey: "id", labelKey: "label" } },
         { kind: "text", key: "title", label: "Title" },
         { kind: "image", key: "image", label: "Image (optional)" },
         { kind: "text", key: "meta", label: "Meta line" },
@@ -388,4 +392,21 @@ export function schemaForKey(key: PageKey): PageSchema {
 /** The list on a page that is shown as cards with per-item edit pages (Projects, Poster presentations), if any. */
 export function cardListField(schema: PageSchema): Extract<FieldDef, { kind: "list" }> | undefined {
   return schema.fields.find((f): f is Extract<FieldDef, { kind: "list" }> => f.kind === "list" && !!f.cards);
+}
+
+/** The choices of a "select" field: its fixed list, or the values currently present in the page's data. */
+export function selectOptions(
+  field: Extract<FieldDef, { kind: "select" }>,
+  pageData: unknown
+): { value: string; label: string }[] {
+  if (field.options) return field.options;
+  const from = field.optionsFrom;
+  if (!from) return [];
+  let node: unknown = pageData;
+  for (const seg of from.path) node = (node as Record<string, unknown> | undefined)?.[seg];
+  if (!Array.isArray(node)) return [];
+  return node
+    .map((item) => item as Record<string, unknown>)
+    .filter((item) => item && item[from.valueKey])
+    .map((item) => ({ value: String(item[from.valueKey]), label: String(item[from.labelKey] || "Untitled section") }));
 }

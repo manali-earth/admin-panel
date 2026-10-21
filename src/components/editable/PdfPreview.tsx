@@ -8,9 +8,9 @@ declare global {
   }
 }
 
-// The viewer script is the website's own /pdf-viewer.js, copied here by `pnpm sync:preview`,
+// The viewer script is the live website's own /pdf-viewer.js (fetched on request),
 // so the editor shows a PDF exactly the way the live site will.
-const VIEWER_SRC = "/site/pdf-viewer.js";
+const VIEWER_SRC = "/api/live/asset/pdf-viewer.js";
 let viewerPromise: Promise<void> | null = null;
 
 function loadViewer(): Promise<void> {

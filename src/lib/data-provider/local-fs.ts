@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import type { DatabaseIndex, PageDataMap, PageKey } from "@/lib/types";
 import { PAGE_FILENAMES } from "@/lib/page-filenames";
+import { SITE_TEXT_FILENAME, type SiteTextMap } from "@/lib/site-text";
 import type { CommitRequest, CommitResult, DataProvider, FileChange } from "./types";
 
 /**
@@ -32,6 +33,15 @@ export class LocalFsProvider implements DataProvider {
     return JSON.parse(raw) as PageDataMap[K];
   }
 
+  async getSiteText(): Promise<SiteTextMap> {
+    try {
+      return JSON.parse(await fs.readFile(path.join(DATABASE_DIR, SITE_TEXT_FILENAME), "utf8")) as SiteTextMap;
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException).code === "ENOENT") return {};
+      throw err;
+    }
+  }
+
   async commit(request: CommitRequest): Promise<CommitResult> {
     for (const change of request.databaseFiles) {
       await writeUnder(DATABASE_DIR, change);
@@ -46,6 +56,28 @@ export class LocalFsProvider implements DataProvider {
       }
     }
     return { provider: "local-fs" };
+  }
+
+  async getPhotoSizes(): Promise<Map<string, number>> {
+    const sizes = new Map<string, number>();
+    const root = path.join(DATABASE_DIR, "photos");
+    async function walk(dir: string, rel: string): Promise<void> {
+      let entries: import("node:fs").Dirent[];
+      try {
+        entries = await fs.readdir(dir, { withFileTypes: true });
+      } catch (err) {
+        if ((err as NodeJS.ErrnoException).code === "ENOENT") return;
+        throw err;
+      }
+      for (const entry of entries) {
+        const full = path.join(dir, entry.name);
+        const key = `${rel}/${entry.name}`;
+        if (entry.isDirectory()) await walk(full, key);
+        else if (entry.isFile()) sizes.set(key, (await fs.stat(full)).size);
+      }
+    }
+    await walk(root, "photos");
+    return sizes;
   }
 }
 

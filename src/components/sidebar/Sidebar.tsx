@@ -11,7 +11,7 @@ function hrefForPageKey(key: PageKey): string {
   return slug === "home" ? "/" : `/${slug}`;
 }
 
-const DEFAULT_HINT = "Add, edit, delete, and reorder items directly in the content — hover any item for its controls.";
+const DEFAULT_HINT = "Click any text to edit it. Use the buttons on each item to add, delete or reorder. Nothing goes live until you press Save changes.";
 
 export function Sidebar({ pageKey, hint = DEFAULT_HINT }: { pageKey: PageKey; hint?: string }) {
   const router = useRouter();
@@ -59,7 +59,7 @@ export function Sidebar({ pageKey, hint = DEFAULT_HINT }: { pageKey: PageKey; hi
             className={`preview-toggle-btn${previewMode ? " preview-toggle-btn-active" : ""}`}
             onClick={handlePreviewToggle}
           >
-            {previewMode ? "Exit preview" : "Preview site"}
+            {previewMode ? "← Back to editing" : "👁 Preview the website"}
           </button>
 
           {!previewMode && pageKey && (

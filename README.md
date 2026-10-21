@@ -88,7 +88,8 @@ workflow at `.github/workflows/deploy.yml`.
   styled span/div that looks like the live site (same `styles.css`); on
   click it becomes an input in place; changes update the Zustand store
   immediately, which is what's on screen — there's no separate "preview"
-  render pass to keep in sync.
+  render pass to keep in sync. **Preview site** shows the real, deployed website (see
+  "Live preview" below).
 - **Save button behavior** — building the final JSON, staged-image
   handling, and the single multi-file commit all happen in
   `content-store.ts`'s `save()` action and the `/api/save` route. The
@@ -111,9 +112,54 @@ workflow at `.github/workflows/deploy.yml`.
   `gisProjects` → `photos/projects/` and `researchPublications` →
   `photos/publications/`, which don't match their own page slugs).
 
+## Live preview (no syncing)
+
+**Preview site** shows the real website, fetched live from `WEBSITE_URL` (default `https://munakhan.pages.dev`), running its own
+unmodified code on your unsaved draft. Nothing from the website is copied into this repo, so there is nothing to keep in step:
+whatever the site looks like and does today is what the preview shows.
+
+How it works (`src/lib/live-site.ts`, `src/lib/live-bridge.ts`, `src/app/api/live/`):
+
+- `/api/live/page?path=/projects/` fetches the page's HTML from the live site and injects a `<base>` tag (so the site's
+  CSS/JS/fonts load straight from it) and a small bridge script ahead of the site's own scripts.
+- The bridge answers the site's data requests (`/database/database.json`, `home.json`, `projects.json`, `site-text.json` …)
+  with the draft posted in by the admin, so the site's real `app.js` renders unsaved edits. Each edit calls the site's own
+  `load()` again — no reload, scroll position kept. Links and `#anchors` stay inside the preview; `mailto:`/`tel:` do nothing.
+- The proxied page runs under a Content-Security-Policy whose `connect-src` lists only the website and its data hosts
+  (not this app), so the site's scripts cannot call this admin's own `/api` routes. Only paths of `WEBSITE_URL` are ever fetched.
+- The editor's own stylesheet is the live site's `styles.css` (three clashing design tokens renamed on the fly) —
+  `/api/live/asset/styles.css`.
+
+## Storage limit
+
+The database repo's `photos/` directory has a hard cap, set by `PHOTOS_STORAGE_LIMIT_MB` (default **80**; `wrangler.toml`
+`[vars]` / Cloudflare dashboard / `.env.local`). On **Save**, before anything is sent to GitHub, `/api/save` reads the current size
+of `photos/` from the Git trees API and works out what it would be after the save (new files added, replaced and deleted files
+subtracted). If that is over the limit the save is refused (HTTP 413) and the editor shows
+"Storage limit reached — failed to save"; nothing is pushed and the draft is kept, so you can remove photos and save again.
+The sidebar shows a usage meter. If the folder cannot be measured the save is refused too (it fails closed).
+Only page JSON files and `photos/…` can be written through `/api/save`, and the commit message is always neutral
+(`Update content — <timestamp>`).
+
+The cap measures the current `photos/` directory. Git history keeps older versions of replaced/deleted files, so
+repository size can still grow over time even while the folder stays under the cap.
+
+## Site text
+
+**Site text** (top menu) lists every fixed piece of wording on the website — menu labels, section headings, link and button captions,
+footer links — read from the live site (`data-text="…"` attributes in its HTML and `window.SITE_TEXT_DEFAULTS` in its `app.js`).
+An empty box keeps the website's own wording; typing replaces it. Overrides are saved as `site-text.json` in the database repo and
+shown in Preview. Page content itself (stories, projects, news …) is edited on each page.
+
+## Projects page sections
+
+The groups the Projects page is divided into (`categories` in `projects.json`) are editable on the Projects page: add, rename, reorder
+or remove sections, then pick a section for each project. A project whose section was removed shows under "More projects" on the site.
+Each project's own detail-page sections (heading + text/photos) are added from its **Edit content** page.
+
 ## Card pages: Projects and Poster presentations
 
-These two pages show a grid of cards (add, delete, reorder with ← →). **Edit content** on a card opens that item's own page at `/<page>/<item id>` (e.g. `/gis-projects/project-1`, `/posters/poster-ab12cd34`), where all of its fields are edited. A page opts in with `cards: {...}` on its list field in `src/lib/page-schemas.ts`. In Poster presentations a section's content can also be a PDF (`allowPdf` on the `blockList` field): the PDF is staged and committed with Save like an image, and previewed with the same viewer the website uses (`public/site/pdf-viewer.js`, `public/vendor/pdfjs/`, both copied by `pnpm sync:preview`).
+These two pages show a grid of cards (add, delete, reorder with ← →). **Edit content** on a card opens that item's own page at `/<page>/<item id>` (e.g. `/gis-projects/project-1`, `/posters/poster-ab12cd34`), where all of its fields are edited. A page opts in with `cards: {...}` on its list field in `src/lib/page-schemas.ts`. In Poster presentations a section's content can also be a PDF (`allowPdf` on the `blockList` field): the PDF is staged and committed with Save like an image, and previewed with the same viewer the website uses (the live site's own `pdf-viewer.js`, fetched on request via `/api/live/asset/pdf-viewer.js`, plus the vendored PDF.js build in `public/vendor/pdfjs/`).
 
 Education & Experience has a Certificates list (image + caption).
 
@@ -143,3 +189,11 @@ pnpm cf:deploy      # or let the GitHub Actions workflow do this on push to main
 `@opennextjs/cloudflare` is the current recommended Next.js-on-Cloudflare
 adapter; check https://opennext.js.org/cloudflare before deploying in case
 its CLI has moved on since this was written.
+
+## Keeping this repository private
+
+This repository must be **private**, and nothing in the website or database repositories may mention it — visitors should believe
+the only way to update the site is by editing the database repo by hand. The admin only needs: read access to the website
+repo (for `database/database.json`), read + write access to the database repo (fine-grained token, Contents), and the live
+website's public address. No website or database file, README or commit message refers to it (commits made through `/api/save` read
+"Update content — <timestamp>").

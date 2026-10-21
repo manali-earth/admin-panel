@@ -12,11 +12,11 @@ export function HistoryControls() {
 
   return (
     <div className="history-controls">
-      <button type="button" disabled={!canUndo} onClick={undo}>
-        Undo
+      <button type="button" disabled={!canUndo} onClick={undo} title="Undo the last change">
+        ↶ Undo
       </button>
-      <button type="button" disabled={!canRedo} onClick={redo}>
-        Redo
+      <button type="button" disabled={!canRedo} onClick={redo} title="Redo">
+        ↷ Redo
       </button>
       <button
         type="button"
@@ -26,7 +26,7 @@ export function HistoryControls() {
           if (window.confirm("Discard all unsaved changes and restore the last saved version?")) resetAll();
         }}
       >
-        Reset
+        Discard all
       </button>
     </div>
   );

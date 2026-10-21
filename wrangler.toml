@@ -20,6 +20,13 @@ DATABASE_REPO = "manali-earth/database"   # "owner/database-repo-name"
 DATABASE_BRANCH = "main"
 DATABASE_INDEX_PATH = "database.json"
 
+# Live preview is built from the deployed website at this address (fetched on demand — nothing is copied or synced).
+WEBSITE_URL = "https://munakhan.pages.dev"
+
+# Hard cap, in MB, on the size of the database repo's photos/ directory. A save that would take the folder over this
+# is refused before anything is pushed to GitHub. Change the number here (or in the Cloudflare dashboard) to change the limit.
+PHOTOS_STORAGE_LIMIT_MB = "80"
+
 # NOTE: @opennextjs/cloudflare's exact build/CLI commands move fast enough
 # that this file's `main` path and the [assets] shape are worth checking
 # against https://opennext.js.org/cloudflare at deploy time.

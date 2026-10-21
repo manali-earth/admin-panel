@@ -1,7 +1,7 @@
 "use client";
 
 import type { FieldDef } from "@/lib/page-schemas";
-import { fieldReactKey } from "@/lib/page-schemas";
+import { fieldReactKey, selectOptions } from "@/lib/page-schemas";
 import type { ContentBlock, PageKey } from "@/lib/types";
 import { getAtPath } from "@/lib/object-path";
 import { type FieldPath, useContentStore } from "@/store/content-store";
@@ -70,7 +70,7 @@ export function FieldRenderer({ pageKey, field, basePath }: FieldRendererProps) 
             onChange={(e) => setField(pageKey, path, e.target.value)}
           >
             <option value="">Choose a section…</option>
-            {field.options.map((o) => (
+            {selectOptions(field, page).map((o) => (
               <option key={o.value} value={o.value}>
                 {o.label}
               </option>

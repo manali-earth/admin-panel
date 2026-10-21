@@ -22,7 +22,8 @@ export async function GET(request: Request) {
     const index = await provider.getDatabaseIndex();
     const entries = await Promise.all(PAGE_KEYS.map(async (key) => [key, await provider.getPageData(key, index)] as const));
     const pages = Object.fromEntries(entries);
-    return NextResponse.json({ index, pages });
+    const siteText = await provider.getSiteText();
+    return NextResponse.json({ index, pages, siteText });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json({ error: message }, { status: 500 });

@@ -6,6 +6,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [show, setShow] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -34,26 +35,29 @@ export default function LoginPage() {
   return (
     <main className="auth-page">
       <section className="auth-card" aria-labelledby="login-title">
-        <p className="auth-kicker">PORTFOLIO / ADMIN</p>
-        <h1 id="login-title">Private workspace</h1>
-        <p className="auth-intro">Enter the admin password to edit the portfolio database.</p>
+        <p className="auth-kicker">WEBSITE EDITOR</p>
+        <h1 id="login-title">Welcome back</h1>
+        <p className="auth-intro">Sign in to edit your website. Your changes are only published when you press Save.</p>
         <form onSubmit={submit} className="auth-form">
           <label htmlFor="admin-password">Password</label>
           <input
             id="admin-password"
-            type="password"
+            type={show ? "text" : "password"}
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             autoComplete="current-password"
             autoFocus
             required
           />
+          <label className="auth-show">
+            <input type="checkbox" checked={show} onChange={(e) => setShow(e.target.checked)} /> Show password
+          </label>
           {error && <p className="auth-error" role="alert">{error}</p>}
           <button type="submit" className="auth-submit" disabled={busy || !password}>
-            {busy ? "Checking…" : "Enter admin panel"}
+            {busy ? "Signing in…" : "Sign in"}
           </button>
         </form>
-        <p className="auth-note">Access is limited to people who have the shared password.</p>
+        <p className="auth-note">This page is private.</p>
       </section>
     </main>
   );

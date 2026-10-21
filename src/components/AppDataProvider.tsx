@@ -4,10 +4,12 @@ import { useEffect, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { useContentStore } from "@/store/content-store";
 import type { DatabaseIndex, PageDataMap, PageKey } from "@/lib/types";
+import type { SiteTextMap } from "@/lib/site-text";
 
 interface DataResponse {
   index: DatabaseIndex;
   pages: PageDataMap;
+  siteText?: SiteTextMap;
 }
 
 export function AppDataProvider({ children }: { children: ReactNode }) {
@@ -15,6 +17,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const setDatabaseIndex = useContentStore((s) => s.setDatabaseIndex);
   const loadPage = useContentStore((s) => s.loadPage);
+  const loadSiteText = useContentStore((s) => s.loadSiteText);
+  const refreshStorage = useContentStore((s) => s.refreshStorage);
 
   useEffect(() => {
     if (pathname === "/login") return;
@@ -33,6 +37,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         if (cancelled) return;
         setDatabaseIndex(data.index);
         (Object.keys(data.pages) as PageKey[]).forEach((key) => loadPage(key, data.pages[key]));
+        loadSiteText(data.siteText ?? {});
+        void refreshStorage();
         setStatus("ready");
       })
       .catch(() => {
@@ -42,7 +48,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [pathname, loadPage, setDatabaseIndex]);
+  }, [pathname, loadPage, loadSiteText, refreshStorage, setDatabaseIndex]);
 
   if (pathname === "/login") return <>{children}</>;
   if (status === "loading") return <div className="app-loading">Loading content…</div>;

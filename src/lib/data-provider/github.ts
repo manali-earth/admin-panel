@@ -1,5 +1,6 @@
 import type { DatabaseIndex, PageDataMap, PageKey } from "@/lib/types";
 import { PAGE_FILENAMES } from "@/lib/page-filenames";
+import { SITE_TEXT_FILENAME, type SiteTextMap } from "@/lib/site-text";
 import type { CommitRequest, CommitResult, DataProvider } from "./types";
 
 const GITHUB_REST_URL = "https://api.github.com";
@@ -54,6 +55,16 @@ export class GithubProvider implements DataProvider {
     const { owner, name } = splitRepo(this.config.databaseRepo);
     const raw = await this.fetchFileContents(owner, name, this.config.databaseBranch, PAGE_FILENAMES[key]);
     return JSON.parse(raw) as PageDataMap[K];
+  }
+
+  async getSiteText(): Promise<SiteTextMap> {
+    const { owner, name } = splitRepo(this.config.databaseRepo);
+    try {
+      return JSON.parse(await this.fetchFileContents(owner, name, this.config.databaseBranch, SITE_TEXT_FILENAME)) as SiteTextMap;
+    } catch (err) {
+      if (err instanceof Error && / 404 /.test(err.message)) return {}; // not created yet
+      throw err;
+    }
   }
 
   /** Reads a single file via the REST Contents API (works for public and private repos). */
@@ -126,6 +137,30 @@ export class GithubProvider implements DataProvider {
       body: JSON.stringify({ sha: commit.sha, force: false })
     });
     return { provider: "github", commitSha: commit.sha, commitUrl: commit.html_url };
+  }
+
+  /** Sizes of every blob under photos/ at the branch head, read from the Git trees API (no file contents downloaded). */
+  async getPhotoSizes(): Promise<Map<string, number>> {
+    const { owner, name } = splitRepo(this.config.databaseRepo);
+    const branch = this.config.databaseBranch;
+    const head = await this.githubJson<{ object: { sha: string } }>(
+      `/repos/${owner}/${name}/git/ref/heads/${encodeURIComponent(branch)}`
+    );
+    const headCommit = await this.githubJson<{ tree: { sha: string } }>(`/repos/${owner}/${name}/git/commits/${head.object.sha}`);
+    const root = await this.githubJson<{ tree: { path: string; type: string; sha: string }[] }>(
+      `/repos/${owner}/${name}/git/trees/${headCommit.tree.sha}`
+    );
+    const sizes = new Map<string, number>();
+    const photos = root.tree.find((e) => e.path === "photos" && e.type === "tree");
+    if (!photos) return sizes;
+    const listing = await this.githubJson<{ truncated: boolean; tree: { path: string; type: string; size?: number }[] }>(
+      `/repos/${owner}/${name}/git/trees/${photos.sha}?recursive=1`
+    );
+    if (listing.truncated) throw new Error("The photos folder is too large to measure — refusing to save.");
+    for (const entry of listing.tree) {
+      if (entry.type === "blob") sizes.set(`photos/${entry.path}`, entry.size ?? 0);
+    }
+    return sizes;
   }
 
   private async createBlob(owner: string, name: string, contentsBase64: string): Promise<string> {

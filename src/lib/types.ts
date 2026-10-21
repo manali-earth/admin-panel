@@ -15,6 +15,8 @@ export interface DatabaseIndex {
   researchPublications: string;
   conferences: string;
   posters: string;
+  /** Optional: URL of site-text.json (wording overrides). */
+  siteText?: string;
 }
 
 /** The seven page-data keys, in database.json / dbKey form. */

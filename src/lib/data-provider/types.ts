@@ -1,4 +1,5 @@
 import type { DatabaseIndex, PageDataMap, PageKey } from "@/lib/types";
+import type { SiteTextMap } from "@/lib/site-text";
 
 /** One file to write, relative to the database repo's root. Binary or text — always base64. */
 export interface FileChange {
@@ -27,6 +28,13 @@ export interface CommitResult {
 export interface DataProvider {
   getDatabaseIndex(): Promise<DatabaseIndex>;
   getPageData<K extends PageKey>(key: K, index: DatabaseIndex): Promise<PageDataMap[K]>;
+  /** Wording overrides (site-text.json). A missing file means no overrides yet: {}. */
+  getSiteText(): Promise<SiteTextMap>;
   /** Writes every file in one atomic commit (or one atomic local write in dev). */
   commit(request: CommitRequest): Promise<CommitResult>;
+  /**
+   * Every file currently in the repo's photos/ directory → its size in bytes (keys like "photos/home/a.jpg").
+   * Must throw if the listing is incomplete: the storage limit check fails closed rather than guessing.
+   */
+  getPhotoSizes(): Promise<Map<string, number>>;
 }

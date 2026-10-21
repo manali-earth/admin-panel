@@ -7,6 +7,18 @@ const nextConfig = {
   // there is nothing for the optimizer to do anyway.
   images: {
     unoptimized: true
+  },
+  // This is a private tool: keep it out of search engines and out of other sites' frames.
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+          { key: "Referrer-Policy", value: "no-referrer" }
+        ]
+      }
+    ];
   }
 };
 

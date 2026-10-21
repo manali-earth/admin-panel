@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { generateId } from "@/lib/auto-id";
-import type { FieldDef } from "@/lib/page-schemas";
+import { selectOptions, type FieldDef } from "@/lib/page-schemas";
 import { PAGE_KEY_TO_SLUG, type PageKey } from "@/lib/types";
 import { type FieldPath, useContentStore } from "@/store/content-store";
 
@@ -35,10 +35,11 @@ export function CardGrid({ pageKey, path, items, field }: CardGridProps) {
   const removeListItemAt = useContentStore((s) => s.removeListItemAt);
   const moveListItem = useContentStore((s) => s.moveListItem);
   const imagePreviewUrl = useContentStore((s) => s.imagePreviewUrl);
+  const pageData = useContentStore((s) => s.draft[pageKey]);
   const optionLabel = (key: string | undefined, value: unknown) => {
     if (!key || !value) return "";
     const def = field.itemFields.find((f) => f.key === key);
-    return def && def.kind === "select" ? (def.options.find((o) => o.value === value)?.label ?? "") : "";
+    return def && def.kind === "select" ? (selectOptions(def, pageData).find((o) => o.value === value)?.label ?? "") : "";
   };
   if (!cards) return null;
   const noun = field.itemLabel.toLowerCase();
